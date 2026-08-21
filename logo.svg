@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Nidanza: el nido tejido por dos (terracota y ámbar, los dos progenitores)
+       cuidando el huevo con el corazón. La retícula de fondo es el calendario. -->
+  <rect width="512" height="512" rx="104" fill="#FFF3E3"/>
+  <g stroke="#F2DDC0" stroke-width="2" opacity=".55">
+    <line x1="64" y1="0" x2="64" y2="512"/><line x1="0" y1="64" x2="512" y2="64"/>
+    <line x1="128" y1="0" x2="128" y2="512"/><line x1="0" y1="128" x2="512" y2="128"/>
+    <line x1="192" y1="0" x2="192" y2="512"/><line x1="0" y1="192" x2="512" y2="192"/>
+    <line x1="256" y1="0" x2="256" y2="512"/><line x1="0" y1="256" x2="512" y2="256"/>
+    <line x1="320" y1="0" x2="320" y2="512"/><line x1="0" y1="320" x2="512" y2="320"/>
+    <line x1="384" y1="0" x2="384" y2="512"/><line x1="0" y1="384" x2="512" y2="384"/>
+    <line x1="448" y1="0" x2="448" y2="512"/><line x1="0" y1="448" x2="512" y2="448"/>
+  </g>
+  <!-- el huevo -->
+  <path d="M256 112 C 206 112, 176 164, 176 220 C 176 276, 212 312, 256 312 C 300 312, 336 276, 336 220 C 336 164, 306 112, 256 112 Z"
+        fill="#FFF9F1" stroke="#EFD8B6" stroke-width="6"/>
+  <!-- el corazón sobre el huevo -->
+  <path d="M256 234 C 234 218, 224 206, 224 192 C 224 180, 233 172, 244 172 C 250 172, 255 175, 256 180 C 257 175, 262 172, 268 172 C 279 172, 288 180, 288 192 C 288 206, 278 218, 256 234 Z"
+        fill="#D96B4B"/>
+  <!-- el nido: tres hebras tejidas -->
+  <path d="M96 250 C 108 366, 180 414, 256 414 C 332 414, 404 366, 416 250"
+        fill="none" stroke="#D96B4B" stroke-width="52" stroke-linecap="round"/>
+  <path d="M148 238 C 158 330, 204 364, 256 364 C 308 364, 354 330, 364 238"
+        fill="none" stroke="#EFAF55" stroke-width="44" stroke-linecap="round"/>
+  <path d="M176 330 C 204 356, 308 356, 336 330"
+        fill="none" stroke="#E8926B" stroke-width="32" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- SEO: si el dominio final no es nidanza.es, sustituirlo aquí, en robots.txt y en sitemap.xml -->
+<title>Nidanza — app del permiso de nacimiento y paternidad</title>
+<meta name="description" content="Calcula y reparte las 19 semanas del permiso de nacimiento (paternidad y maternidad, 2026). Calendario compartido, lista del bebé y PDF para la empresa.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://nidanza.es/">
+<meta name="theme-color" content="#FFF3E3">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nidanza.es/">
+<meta property="og:locale" content="es_ES">
+<meta property="og:title" content="Nidanza — el permiso de nacimiento, en calma">
+<meta property="og:description" content="El permiso de nacimiento, repartido entre los dos. El primer año, en calma.">
+<meta property="og:image" content="https://nidanza.es/icono-512.png">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icono-180.png">
+<link rel="preload" href="fonts/nunito-latin-400_900.woff2" as="font" type="font/woff2" crossorigin>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Nidanza",
+  "operatingSystem": "Android, iOS, Web",
+  "applicationCategory": "LifestyleApplication",
+  "description": "Planificador del permiso por nacimiento y cuidado del menor (España, RDL 9/2025): reparte las 19 semanas de cada progenitor, con calendario compartido en pareja, lista del bebé y PDF para la empresa.",
+  "inLanguage": "es",
+  "url": "https://nidanza.es/",
+  "image": "https://nidanza.es/icono-512.png",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cuántas semanas de permiso me tocan en 2026?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Desde el 1 de enero de 2026 (RDL 9/2025), 19 semanas por progenitor: 6 obligatorias tras el parto, 11 flexibles hasta que el bebé cumpla 12 meses y 2 que se pueden guardar hasta los 8 años. En familias monoparentales, 32. La prestación es el 100 % de la base reguladora." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Esto es el permiso de paternidad y maternidad?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sí: desde 2021 los antiguos permisos de maternidad y paternidad están unificados en el permiso por nacimiento y cuidado del menor, igual para los dos progenitores. Nidanza planifica ese permiso." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Las semanas flexibles se pueden coger sueltas?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Se disfrutan por semanas completas, avisando a la empresa con 15 días. No tienen que empezar en lunes: la semana arranca el día que elijas. Nidanza enseña dónde colocarlas para no desperdiciar festivos." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Esto sustituye a la Seguridad Social o a RRHH?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Nidanza es una herramienta de planificación, no un informe jurídico: sirve para decidir el reparto en casa, y las fechas se contrastan con RRHH y la Seguridad Social antes de registrar nada." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuándo estará en las tiendas?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Muy pronto: la app está terminada y en proceso de publicación en Google Play y App Store. Esta página se actualizará con los enlaces de descarga en cuanto estén activos." }
+    }
+  ]
+}
+</script>
+<style>
+/* Nunito autoalojada, como en la app: sin peticiones a terceros. */
+@font-face{font-family:'Nunito';font-style:normal;font-weight:400 900;font-display:swap;src:url(fonts/nunito-latin-400_900.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212,U+FEFF}
+@font-face{font-family:'Nunito';font-style:normal;font-weight:400 900;font-display:swap;src:url(fonts/nunito-latin-ext-400_900.woff2) format('woff2');unicode-range:U+0100-02BA,U+1E00-1E9F,U+20A0-20AB,U+20AD-20C0}
+
+:root{
+  --cal:#FFF3E3; --carta:#FFFFFF; --papel2:#FFF9F1; --linea:#EBD6B4;
+  --tinta:#12314F; --tinta2:#4F6B87;
+  --c1:#B5CDEA; --c2:#9ED0CC; --azul:#9FC0E6; --azulF:#3376CC;
+  --groc:#E9AE4B; --buit:#C8523C; --terracota:#D96B4B; --ambar:#EFAF55;
+  --hueco:#FDEDE9;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} .tienda{transition:none} .tienda:active{transform:none} }
+body{margin:0;background:var(--cal);color:var(--tinta);
+  font-family:'Nunito',system-ui,'Segoe UI',sans-serif;font-size:16.5px;line-height:1.6;font-weight:500;
+  -webkit-tap-highlight-color:transparent}
+h1,h2,h3{font-weight:800;letter-spacing:-.01em;margin:0;text-wrap:balance}
+h2{scroll-margin-top:24px}
+p{margin:0}
+a{color:var(--azulF)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--azulF);outline-offset:2px}
+.salto{position:absolute;left:-9999px;top:0;background:var(--carta);color:var(--tinta);
+  padding:10px 16px;border-radius:0 0 10px 0;font-weight:800;z-index:10}
+.salto:focus{left:0}
+
+main{max-width:1020px;margin:0 auto;padding:0 20px calc(60px + env(safe-area-inset-bottom))}
+
+/* ---- hero ---- */
+.hero{display:flex;align-items:center;gap:44px;flex-wrap:wrap;padding:64px 0 48px}
+.hero-tx{flex:1 1 400px;min-width:0}
+.marca{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.marca img{border-radius:22%;display:block}
+.marca span{font-size:26px;font-weight:900;letter-spacing:-.01em}
+.hero h1{font-size:clamp(32px,5.5vw,50px);line-height:1.08;margin-bottom:14px}
+.hero .sub{font-size:19px;color:var(--tinta2);max-width:46ch;margin-bottom:26px}
+.tiendas{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.tienda{display:inline-flex;align-items:center;gap:10px;background:var(--tinta);color:#fff;
+  border:none;border-radius:14px;padding:11px 18px;font-family:inherit;font-size:15px;font-weight:700;
+  text-decoration:none;touch-action:manipulation;transition:background .14s,transform .14s}
+.tienda:hover{background:#1D4368}
+.tienda:active{transform:scale(.97)}
+.tienda svg{width:20px;height:20px;flex:0 0 auto}
+.tienda small{display:block;font-size:10.5px;font-weight:600;opacity:.75;line-height:1.1}
+.tienda b{display:block;font-size:14.5px;line-height:1.15}
+.pronto{font-size:12.5px;color:var(--tinta2);font-weight:700;flex-basis:100%}
+
+/* ---- el teléfono ---- */
+.movil{flex:0 0 auto;width:min(290px,72vw);margin-inline:auto;background:var(--carta);
+  border:1px solid var(--linea);border-radius:34px;padding:14px 12px 18px;
+  box-shadow:0 24px 60px -30px rgba(90,60,35,.45)}
+.movil,.movil *{pointer-events:none}
+.m-barra{height:22px;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;color:var(--tinta2);background:#F2DDC0;border-radius:8px;margin-bottom:10px}
+.m-mes{font-size:12.5px;font-weight:800;padding:0 4px;margin-bottom:6px;display:flex;justify-content:space-between}
+.m-mes span{color:var(--tinta2);font-weight:700;font-size:10px}
+.m-dias{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.m-d{aspect-ratio:1/1;border-radius:6px;background:var(--papel2);font-size:9.5px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.m-d.a{background:var(--c1)} .m-d.b{background:var(--c2)}
+.m-d.ab{background:linear-gradient(135deg,var(--c1) 50%,var(--c2) 50%)}
+.m-d.h{background:var(--hueco)} .m-d.v{visibility:hidden}
+.m-leyenda{display:flex;gap:10px;margin-top:12px;padding:0 2px;flex-wrap:wrap}
+.m-leyenda span{font-size:9.5px;font-weight:700;color:var(--tinta2);display:inline-flex;align-items:center;gap:4px}
+.m-leyenda i{width:9px;height:9px;border-radius:3px;display:inline-block}
+
+/* ---- secciones ---- */
+section{padding:34px 0}
+.kicker{font-size:12.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--terracota);margin-bottom:6px}
+section>h2{font-size:clamp(24px,3.6vw,32px);margin-bottom:10px}
+.intro{color:var(--tinta2);max-width:62ch;margin-bottom:26px}
+.tarjetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.tarjeta{background:var(--carta);border:1px solid var(--linea);border-radius:16px;padding:20px 22px}
+.tarjeta .ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:12px;color:var(--tinta)}
+.tarjeta .ic svg{width:20px;height:20px}
+.tarjeta h3{font-size:17.5px;margin-bottom:6px}
+.tarjeta p{font-size:14.5px;color:var(--tinta2)}
+
+/* ---- privacidad ---- */
+.privacidad{background:var(--carta);border:1px solid var(--linea);border-radius:20px;padding:28px;
+  display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.privacidad .huevo{flex:0 0 auto;width:84px;height:84px}
+.privacidad div{flex:1 1 320px;min-width:0}
+.privacidad h2{font-size:22px;margin-bottom:8px}
+.privacidad p{font-size:15px;color:var(--tinta2)}
+
+/* ---- preguntas ---- */
+details{background:var(--carta);border:1px solid var(--linea);border-radius:14px;margin-bottom:10px}
+summary{cursor:pointer;font-weight:800;font-size:15.5px;padding:15px 18px;list-style:none;display:flex;justify-content:space-between;gap:12px;touch-action:manipulation}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--terracota);font-weight:800;flex:0 0 auto}
+details[open] summary::after{content:"–"}
+summary:hover{color:var(--azulF)}
+details .cuerpo{padding:0 18px 16px;font-size:14.5px;color:var(--tinta2)}
+details .cuerpo p+p{margin-top:8px}
+
+footer{border-top:1px solid var(--linea);margin-top:30px;padding:26px 0 0;font-size:13px;color:var(--tinta2)}
+footer p+p{margin-top:8px}
+</style>
+</head>
+<body>
+<a class="salto" href="#contenido">Saltar al contenido</a>
+<main id="contenido">
+
+  <header class="hero">
+    <div class="hero-tx">
+      <p class="marca"><img src="logo.svg" alt="" width="52" height="52" aria-hidden="true"><span translate="no">Nidanza</span></p>
+      <h1>El permiso de nacimiento, repartido entre los dos</h1>
+      <p class="sub">Las 19 semanas de cada progenitor sobre un calendario que enseña dónde quedan huecos sin cubrir. Compartido con tu pareja, con la lista del bebé y el PDF para la empresa.</p>
+      <div class="tiendas">
+        <a class="tienda" href="#preguntas" aria-describedby="notaPronto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.6 1.8c-.4.4-.6 1-.6 1.8v16.8c0 .8.2 1.4.6 1.8l.1.1 9.4-9.4v-.2L3.7 1.7l-.1.1Zm12.7 12.7-3.1-3.1v-.2l3.1-3.1 3.8 2.1c1.1.6 1.1 1.6 0 2.2l-3.8 2.1Zm-1-1-2.9-2.4-2.9 2.4 5.8 3.3-2.9-5.7 2.9-5.7-5.8 3.3 2.9 2.4Z"/></svg>
+          <span><small>Muy pronto en</small><b>Google Play</b></span>
+        </a>
+        <a class="tienda" href="#preguntas" aria-describedby="notaPronto">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.1 12.6c0-2.4 2-3.6 2.1-3.6-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-2-.9-3.2-.9-1.7 0-3.2 1-4 2.5-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.4 0 1.9.8 3.2.8 1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.5-1-2.5-4Zm-2.4-7.2c.6-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.5 2.8-1.3Z"/></svg>
+          <span><small>Muy pronto en</small><b>App Store</b></span>
+        </a>
+        <p class="pronto" id="notaPronto">La app está terminada y en revisión de las tiendas. Estas insignias se activarán al publicarse.</p>
+      </div>
+    </div>
+
+    <div class="movil" role="img" aria-label="Un mes del calendario de Nidanza: los días de cada progenitor en azul y verdeazul pastel, los compartidos partidos en diagonal y los laborables sin cubrir en rosa">
+      <div class="m-barra">Nidanza</div>
+      <p class="m-mes">Octubre <span>2026</span></p>
+      <div class="m-dias" aria-hidden="true">
+        <div class="m-d v"></div><div class="m-d v"></div><div class="m-d v"></div>
+        <div class="m-d ab">1</div><div class="m-d ab">2</div><div class="m-d ab">3</div><div class="m-d ab">4</div>
+        <div class="m-d ab">5</div><div class="m-d ab">6</div><div class="m-d ab">7</div><div class="m-d ab">8</div><div class="m-d ab">9</div><div class="m-d ab">10</div><div class="m-d ab">11</div>
+        <div class="m-d a">12</div><div class="m-d a">13</div><div class="m-d a">14</div><div class="m-d a">15</div><div class="m-d a">16</div><div class="m-d a">17</div><div class="m-d a">18</div>
+        <div class="m-d a">19</div><div class="m-d a">20</div><div class="m-d a">21</div><div class="m-d a">22</div><div class="m-d a">23</div><div class="m-d a">24</div><div class="m-d a">25</div>
+        <div class="m-d b">26</div><div class="m-d b">27</div><div class="m-d h">28</div><div class="m-d h">29</div><div class="m-d h">30</div><div class="m-d">31</div><div class="m-d v"></div>
+      </div>
+      <div class="m-leyenda" aria-hidden="true">
+        <span><i style="background:var(--c1)"></i>Silvia</span>
+        <span><i style="background:var(--c2)"></i>Nacho</span>
+        <span><i style="background:var(--hueco);border:1px solid #F3C9BF"></i>Sin cubrir</span>
+      </div>
+    </div>
+  </header>
+
+  <section aria-labelledby="tQue">
+    <p class="kicker">Qué hace</p>
+    <h2 id="tQue">Un calendario que piensa como RRHH, pero habla como en casa</h2>
+    <p class="intro">Pones la fecha prevista de parto y pintas los días de cada uno: permiso obligatorio, semanas flexibles, vacaciones y lactancia. Nidanza aplica las reglas del RDL 9/2025 —el permiso que unificó la antigua maternidad y paternidad— y te enseña lo que de verdad importa: dónde queda el bebé sin nadie en casa.</p>
+    <div class="tarjetas">
+      <div class="tarjeta">
+        <div class="ic" style="background:var(--c1)"><svg viewBox="0 0 18 18" aria-hidden="true"><rect x="2.2" y="3.4" width="13.6" height="12.2" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.2 7.3h13.6M6.1 1.6v3.2M11.9 1.6v3.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+        <h3>Las 19 semanas de cada uno, sin hojas de cálculo</h3>
+        <p>Cada progenitor tiene 19 semanas de permiso: las 6 obligatorias vienen puestas y las demás se pintan en el calendario arrastrando el dedo. Festivos por comunidad, puentes y calendario escolar incluidos.</p>
+      </div>
+      <div class="tarjeta">
+        <div class="ic" style="background:var(--c2)"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 15.5c-4.2-2.8-6.3-5.2-6.3-8 0-2.2 1.7-3.7 3.7-3.7 1.2 0 2.1.6 2.6 1.5.5-.9 1.4-1.5 2.6-1.5 2 0 3.7 1.5 3.7 3.7 0 2.8-2.1 5.2-6.3 8Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+        <h3>Un calendario, dos móviles</h3>
+        <p>Invita a tu pareja con un código de un solo uso y los dos veis y tocáis el mismo reparto y la misma lista. Nadie pisa los cambios de nadie.</p>
+      </div>
+      <div class="tarjeta">
+        <div class="ic" style="background:var(--ambar)"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.6 4.4l1.2 1.2 2-2M2.6 9l1.2 1.2 2-2M2.6 13.6l1.2 1.2 2-2M9.2 4.7h6.2M9.2 9.3h6.2M9.2 13.9h6.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>La lista del bebé</h3>
+        <p>Las compras ordenadas por semana de gestación, con precios orientativos. Envíasela a quien pregunte qué os regala y que compre directamente.</p>
+      </div>
+      <div class="tarjeta">
+        <div class="ic" style="background:var(--hueco)"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M4 2.5h7l3 3v10a1.5 1.5 0 0 1-1.5 1.5h-8.5a1.5 1.5 0 0 1-1.5-1.5v-11.5a1.5 1.5 0 0 1 1.5-1.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 9.5h6M6 12.5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <h3>El papel que pide la empresa</h3>
+        <p>Un PDF con los tramos de cada progenitor, totales y espacio para firmas, y un archivo de calendario que se importa en Google Calendar sin duplicar eventos.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="tPriv">
+    <div class="privacidad">
+      <svg class="huevo" viewBox="0 0 512 512" aria-hidden="true">
+        <path d="M256 112 C 206 112, 176 164, 176 220 C 176 276, 212 312, 256 312 C 300 312, 336 276, 336 220 C 336 164, 306 112, 256 112 Z" fill="#FFF9F1" stroke="#EFD8B6" stroke-width="6"/>
+        <path d="M256 234 C 234 218, 224 206, 224 192 C 224 180, 233 172, 244 172 C 250 172, 255 175, 256 180 C 257 175, 262 172, 268 172 C 279 172, 288 180, 288 192 C 288 206, 278 218, 256 234 Z" fill="#D96B4B"/>
+        <path d="M96 250 C 108 366, 180 414, 256 414 C 332 414, 404 366, 416 250" fill="none" stroke="#D96B4B" stroke-width="52" stroke-linecap="round"/>
+        <path d="M148 238 C 158 330, 204 364, 256 364 C 308 364, 354 330, 364 238" fill="none" stroke="#EFAF55" stroke-width="44" stroke-linecap="round"/>
+        <path d="M176 330 C 204 356, 308 356, 336 330" fill="none" stroke="#E8926B" stroke-width="32" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <h2 id="tPriv">Tu reparto no sale de tu móvil</h2>
+        <p>Sin anuncios, sin analítica y sin terceros: el calendario se calcula y se guarda en tu dispositivo, y una vez dentro la app funciona sin conexión. Solo si compartes con tu pareja, el reparto viaja —cifrado y a nuestro propio servidor— para que los dos veáis lo mismo. Hasta la tipografía va dentro de la app para no pedirle nada a nadie.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="tFaq" id="preguntas">
+    <p class="kicker">Preguntas</p>
+    <h2 id="tFaq">Lo que todo el mundo pregunta</h2>
+    <div style="margin-top:18px">
+      <details>
+        <summary>¿Cuántas semanas de permiso me tocan en 2026?</summary>
+        <div class="cuerpo"><p>Desde el 1 de enero de 2026 (RDL 9/2025), <strong>19 semanas por progenitor</strong>: 6 obligatorias tras el parto, 11 flexibles hasta que el bebé cumpla 12 meses y 2 que se pueden guardar hasta los 8 años. En familias monoparentales, 32. La prestación es el 100&nbsp;% de la base reguladora.</p></div>
+      </details>
+      <details>
+        <summary>¿Esto es el permiso de paternidad y maternidad?</summary>
+        <div class="cuerpo"><p>Sí: desde 2021 los antiguos permisos de <strong>maternidad</strong> y <strong>paternidad</strong> están unificados en el permiso por nacimiento y cuidado del menor, igual para los dos progenitores. Nidanza planifica ese permiso — se llame como se llame en tu convenio.</p></div>
+      </details>
+      <details>
+        <summary>¿Las semanas flexibles se pueden coger sueltas?</summary>
+        <div class="cuerpo"><p>Se disfrutan por semanas completas, avisando a la empresa con 15 días. No tienen que empezar en lunes: la semana arranca el día que elijas. Nidanza te enseña dónde colocarlas para no desperdiciar festivos.</p></div>
+      </details>
+      <details>
+        <summary>¿Esto sustituye a la Seguridad Social o a RRHH?</summary>
+        <div class="cuerpo"><p>No. Nidanza es una herramienta de planificación, no un informe jurídico: úsala para decidir el reparto en casa y contrasta con RRHH y la Seguridad Social antes de registrar nada.</p></div>
+      </details>
+      <details>
+        <summary>¿Cuándo estará en las tiendas?</summary>
+        <div class="cuerpo"><p>Muy pronto: la app está terminada y en proceso de publicación en Google Play y App Store. Esta página se actualizará con los enlaces de descarga en cuanto estén activos.</p></div>
+      </details>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong translate="no">Nidanza</strong> es una herramienta de planificación del permiso por nacimiento y cuidado del menor (España, RDL 9/2025). No es asesoramiento jurídico.</p>
+    <p>Algunos enlaces de la lista del bebé pueden llevar etiqueta de afiliado: si compras a través de ellos, la app recibe una pequeña comisión sin coste para ti.</p>
+    <p>La tipografía Nunito se distribuye bajo la SIL Open Font License 1.1.</p>
+  </footer>
+</main>
+</body>
+</html>
