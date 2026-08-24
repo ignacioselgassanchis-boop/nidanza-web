@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Si el dominio final no es nidanza.es, sustituirlo aquí y en robots.txt e index.html -->
+<!-- Si el dominio final no es allonest.es, sustituirlo aquí y en robots.txt e index.html -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://nidanza.es/</loc>
+    <loc>https://allonest.es/</loc>
     <lastmod>2026-08-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://nidanza.es/guia-permiso-nacimiento-2026/</loc>
+    <loc>https://allonest.es/guia-permiso-nacimiento-2026/</loc>
     <lastmod>2026-08-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://nidanza.es/que-comprar-bebe/</loc>
+    <loc>https://allonest.es/que-comprar-bebe/</loc>
     <lastmod>2026-08-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

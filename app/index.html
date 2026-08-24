@@ -6,12 +6,12 @@
 <meta name="theme-color" content="#F2DDC0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Anidapp">
+<meta name="apple-mobile-web-app-title" content="Allonest">
 <meta name="description" content="Planificador del permiso de nacimiento y cuidado del menor. El reparto se queda en tu dispositivo.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icono.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icono-180.png">
-<title>Anidapp — permiso de nacimiento</title>
+<title>Allonest — permiso de nacimiento</title>
 <style>
 /* Nunito autoalojada. No se carga desde Google Fonts a propósito: la petición remota
    transmitiría la IP de quien abre la app a un tercero, y esta app no habla con nadie. */
@@ -60,9 +60,12 @@ input,select,textarea{font-size:16px}
 .cab-i{display:flex;justify-content:flex-end;align-items:center;gap:9px;padding:8px 12px}
 /* la marca es un grupo con el ancla a la izquierda: aunque el nombre ceda en pantallas
    estrechas, el logo se queda pegado al borde y no se va con los botones */
-.cab-marca{display:flex;align-items:center;gap:9px;margin-right:auto;min-width:0}
+.cab-marca{display:flex;align-items:center;gap:8px;margin-right:auto;min-width:0}
 .cab-logo{width:42px;height:42px;border-radius:13px;display:block}
-.cab-nombre{font-size:17px;font-weight:800;letter-spacing:-.01em;white-space:nowrap}
+/* line-height 1 y un empujón óptico: la Nunito centra su caja tipográfica, no sus letras,
+   y el nombre quedaba flotando un pelín alto respecto al logo */
+.cab-nombre{font-size:19px;font-weight:900;letter-spacing:-.015em;line-height:1;
+  white-space:nowrap;transform:translateY(1px)}
 @media (max-width:419px){.cab-nombre{display:none}}
 .cab-b{width:42px;height:42px;flex:0 0 auto;border-radius:50%;border:1px solid var(--linea);
   background:#fff;color:var(--azul);cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -444,7 +447,7 @@ html,body{overscroll-behavior-y:contain}
 
   <header class="cab">
     <div class="cab-i">
-      <span class="cab-marca"><img class="cab-logo" src="icons/icono.svg" alt="" width="42" height="42"><span class="cab-nombre" translate="no">Anidapp</span></span>
+      <span class="cab-marca"><img class="cab-logo" src="icons/icono.svg" alt="" width="42" height="42"><span class="cab-nombre" translate="no">Allonest</span></span>
       <button type="button" class="cab-b" id="abreLista" aria-pressed="false" aria-label="La lista del bebé">
         <svg class="ic-lista" viewBox="0 0 18 18" aria-hidden="true"><path d="M2.6 4.4l1.2 1.2 2-2M2.6 9l1.2 1.2 2-2M2.6 13.6l1.2 1.2 2-2M9.2 4.7h6.2M9.2 9.3h6.2M9.2 13.9h6.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <!-- en la lista, el mismo botón pasa a ser la vuelta al calendario -->
@@ -459,8 +462,8 @@ html,body{overscroll-behavior-y:contain}
       </button>
       <!-- solo en la web: en las apps de las tiendas este enlace no existe (lo enseña init si !nativo) -->
       <!-- relativo a propósito: la app web vive en <dominio>/app/, así que ../ es la landing
-           del mismo dominio, sea nidanza.es hoy o anidapp.es mañana -->
-      <a class="cab-b" id="verGuiasWeb" hidden href="../#tGuias" target="_blank" rel="noopener" aria-label="Guías de Anidapp">
+           del mismo dominio, sea nidanza.es hoy o allonest.es mañana -->
+      <a class="cab-b" id="verGuiasWeb" hidden href="../#tGuias" target="_blank" rel="noopener" aria-label="Guías de Allonest">
         <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 4.6 C7.6 3.4 5.5 3 3 3.3 V14.5 C5.5 14.2 7.6 14.6 9 15.8 C10.4 14.6 12.5 14.2 15 14.5 V3.3 C12.5 3 10.4 3.4 9 4.6 Z M9 4.6 V15.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
       </a>
       <button type="button" class="cab-b" id="abreGuia" aria-haspopup="dialog" aria-label="Qué es cada cosa">
@@ -916,7 +919,7 @@ html,body{overscroll-behavior-y:contain}
   </section>
 
   <section class="paso" id="authEntrar" hidden aria-labelledby="authTitulo">
-    <p class="au-marca">Anidapp</p>
+    <p class="au-marca">Allonest</p>
     <h1 id="authTitulo">Entra</h1>
     <p class="sub">Tu cuenta guarda el reparto y te deja seguirlo desde cualquier móvil.</p>
 
@@ -956,7 +959,7 @@ html,body{overscroll-behavior-y:contain}
   </section>
 
   <form class="paso" id="authCrear" hidden novalidate>
-    <p class="au-marca">Anidapp</p>
+    <p class="au-marca">Allonest</p>
     <h2>Crear una cuenta</h2>
     <div class="campo">
       <label class="f">Email
@@ -993,7 +996,7 @@ html,body{overscroll-behavior-y:contain}
   </section>
 
   <form class="paso" id="authRecuperar" hidden novalidate>
-    <p class="au-marca">Anidapp</p>
+    <p class="au-marca">Allonest</p>
     <h2>Recuperar la contraseña</h2>
     <p class="sub">Te mandamos un enlace para ponerte una nueva.</p>
     <div class="campo">
@@ -1011,7 +1014,7 @@ html,body{overscroll-behavior-y:contain}
   </form>
 
   <form class="paso" id="authNueva" hidden novalidate>
-    <p class="au-marca">Anidapp</p>
+    <p class="au-marca">Allonest</p>
     <h2>Contraseña nueva</h2>
     <p class="sub">Escríbela y ya entras con ella.</p>
     <div class="campo">
@@ -2573,7 +2576,7 @@ async function borrarCuenta(){
 
 /* ===== invitaciones ===== */
 function textoInvitacion(cod){
-  return 'Únete a nuestro calendario del permiso en la app Anidapp. Tu código: '+cod+
+  return 'Únete a nuestro calendario del permiso en la app Allonest. Tu código: '+cod+
          (INVITA_URL?'\n'+INVITA_URL+'#'+cod:'');
 }
 async function compartirTexto(txt){
@@ -3549,11 +3552,11 @@ function paginaLista(sel){
     '<path d="M96 250 C 108 366, 180 414, 256 414 C 332 414, 404 366, 416 250" fill="none" stroke="#D96B4B" stroke-width="52" stroke-linecap="round"/>'+
     '<path d="M148 238 C 158 330, 204 364, 256 364 C 308 364, 354 330, 364 238" fill="none" stroke="#EFAF55" stroke-width="44" stroke-linecap="round"/>'+
     '<path d="M176 330 C 204 356, 308 356, 336 330" fill="none" stroke="#E8926B" stroke-width="32" stroke-linecap="round"/>'+
-    '</svg>Anidapp</p>'+
+    '</svg>Allonest</p>'+
     '<h1>'+quien+'</h1>'+
     '<p class="sub">Lista de solo lectura · '+esc(fmt(new Date()))+'</p>'+cuerpo+
     '<footer>Los enlaces llevan afiliado: no cuestan más y ayudan a mantener la app. '+
-    'Hecha con la app Anidapp.</footer></main></body></html>';
+    'Hecha con la app Allonest.</footer></main></body></html>';
 }
 async function enviarPagina(){
   if(!SELENV.size) return;
@@ -3609,7 +3612,7 @@ function icsPliega(l){
   return partes.join('\r\n ');
 }
 function construyeICS(bloques,sello){
-  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Anidapp//Reparto//ES',
+  const L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Allonest//Reparto//ES',
            'CALSCALE:GREGORIAN','METHOD:PUBLISH'];
   bloques.forEach(b=>{
     L.push('BEGIN:VEVENT');
@@ -3734,7 +3737,7 @@ function construyePDF(secciones,nac,gen){
   const D=pdfNuevo();
   const COLX=[PDF_MI,270,346,424,494];
   pdfLogo(D,PDF_MI,44,34);
-  D.txt(PDF_MI+44,66,'Anidapp',{b:1,tam:13});
+  D.txt(PDF_MI+44,66,'Allonest',{b:1,tam:13});
   let y=106;
   D.txt(PDF_MI,y,'Permiso de nacimiento y cuidado del menor',{b:1,tam:15}); y+=17;
   D.txt(PDF_MI,y,'Planificación del reparto · nacimiento el '+pdfLarga(nac)+' · generado el '+pdfLarga(gen),
@@ -3914,7 +3917,7 @@ async function init(){
 
   // la lista del bebé: conmutador en la cabecera, marcado de artículos, altas propias y envío
   SEMLIST.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent='Semana '+s;$('itSem').appendChild(o);});
-  // el enlace a las guías de anidapp.es solo existe en la web: en las apps de las
+  // el enlace a las guías de allonest.es solo existe en la web: en las apps de las
   // tiendas queda oculto (y así ningún revisor ve enlaces salientes en la cabecera)
   if(!nativo) $('verGuiasWeb').hidden=false;
 

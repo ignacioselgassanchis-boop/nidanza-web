@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nidanza.es/sitemap.xml
+Sitemap: https://allonest.es/sitemap.xml
