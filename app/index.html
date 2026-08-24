@@ -566,7 +566,8 @@ html,body{overscroll-behavior-y:contain}
   <div class="hoja-cuerpo" id="ajustesCuerpo">
     <div class="grid-ctrl">
       <label class="f">Fecha prevista de parto
-        <input type="date" id="fnac" readonly>
+        <input type="date" id="fnac" class="sel-oculto" tabindex="-1" aria-hidden="true">
+        <button type="button" class="f-sel" id="fnacBtn">Elegir…</button>
       </label>
       <label class="f">Apodo del bebé
         <input type="text" id="ajApodo" maxlength="20" autocomplete="off">
@@ -816,7 +817,8 @@ html,body{overscroll-behavior-y:contain}
     <h2>Lo imprescindible</h2>
     <div class="campo">
       <label class="f">Fecha prevista de parto
-        <input type="date" id="obFpp" required readonly>
+        <input type="date" id="obFpp" class="sel-oculto" tabindex="-1" aria-hidden="true">
+        <button type="button" class="f-sel" id="obFppBtn">Elegir…</button>
       </label>
     </div>
     <div class="campo">
@@ -3128,7 +3130,7 @@ function pintaAjustes(){
 }
 function sincronizaAjustes(){
   $('ca').value=S.ca; $('familia').value=S.familia; selPinta($('ca'));
-  $('fnac').value=CONFIG?S.nac:'';
+  $('fnac').value=CONFIG?S.nac:''; fechaPinta($('fnac'));
   $('ajApodo').value=S.perfil.apodo;
   $('loc1').value=S.loc[0]||''; $('loc2').value=S.loc[1]||'';
   pintaAjustes();
@@ -3166,7 +3168,7 @@ function muestraPasoOnb(id){
 function abreOnb(modo){
   ONB.modo=modo;
   cierraHoja();
-  $('obFpp').value=CONFIG?S.nac:'';
+  $('obFpp').value=CONFIG?S.nac:''; fechaPinta($('obFpp'));
   $('obApodo').value=S.perfil.apodo;
   sugiereFruta();
   $('obErr1').hidden=true;
@@ -3199,7 +3201,7 @@ function pintaQuienDoc(){
 }
 function guardaPaso1(){
   const fpp=$('obFpp').value, apodo=$('obApodo').value.trim().slice(0,20), err=$('obErr1');
-  if(!fpp){ err.textContent='Nos falta la fecha prevista de parto.'; err.hidden=false; $('obFpp').focus(); return; }
+  if(!fpp){ err.textContent='Nos falta la fecha prevista de parto.'; err.hidden=false; $('obFppBtn').focus(); return; }
   if(!apodo){ err.textContent='Ponle un nombre, aunque sea provisional.'; err.hidden=false; $('obApodo').focus(); return; }
   err.hidden=true;
   S.perfil.apodo=apodo;
@@ -3271,7 +3273,15 @@ function fpAbre(input,titulo){
 function fpCierra(){
   if($('hojaFecha').hidden) return;
   $('hojaFecha').hidden=true; $('fondoPick').hidden=true;
-  const i=FP.input; FP.input=null; if(i&&i.focus) i.focus();
+  // el foco vuelve al BOTÓN, nunca al input date: en iOS, enfocarlo abre el picker del
+  // sistema por encima de esta hoja aunque sea readonly (visto en un iPhone real)
+  const i=FP.input; FP.input=null;
+  const d=(i&&$(i.id+'Btn'))||i; if(d&&d.focus) d.focus();
+}
+/* Gemela de selPinta para las fechas: el input date es solo el portador del valor. */
+function fechaPinta(input){
+  const b=input&&$(input.id+'Btn'); if(!b) return;
+  b.textContent=/^\d{4}-\d{2}-\d{2}$/.test(input.value)?fmt(parseISO(input.value)):'Elegir…';
 }
 function fpPinta(){
   const m0=FP.vista, hoyIso=iso(new Date()), sel=FP.input?FP.input.value:'';
@@ -3289,7 +3299,7 @@ function fpPinta(){
     if(di===sel) b.classList.add('fp-sel');
     b.addEventListener('click',()=>{
       const inp=FP.input; fpCierra();
-      inp.value=di; inp.dispatchEvent(new Event('change'));
+      inp.value=di; fechaPinta(inp); inp.dispatchEvent(new Event('change'));
     });
     g.appendChild(b);
   }
@@ -3908,9 +3918,9 @@ async function init(){
     }
     render(); pintaAjustes();
   });
-  $('btFecha').addEventListener('click',()=>{ sincronizaAjustes(); abreHoja('hojaAjustes'); $('fnac').focus(); });
+  $('btFecha').addEventListener('click',()=>{ sincronizaAjustes(); abreHoja('hojaAjustes'); $('fnacBtn').focus(); });
   $('btGuardar').addEventListener('click',()=>{
-    if(!CONFIG){ hint('Falta la fecha de parto: sin ella no hay calendario que repartir.'); $('fnac').focus(); return; }
+    if(!CONFIG){ hint('Falta la fecha de parto: sin ella no hay calendario que repartir.'); $('fnacBtn').focus(); return; }
     guardarYa(); cierraHoja();
     hint('Ajustes guardados.');
   });
@@ -4012,8 +4022,8 @@ async function init(){
   $('obVerAjustes').addEventListener('click',()=>{ TOUR=true; cierraOnb(); $('abreAjustes').click(); });
 
   // selectores propios: la fecha abre el calendario de la app y la comunidad su lista
-  $('fnac').addEventListener('click',ev=>{ev.preventDefault(); fpAbre($('fnac'),'Fecha prevista de parto');});
-  $('obFpp').addEventListener('click',ev=>{ev.preventDefault(); fpAbre($('obFpp'),'Fecha prevista de parto');});
+  $('fnacBtn').addEventListener('click',()=>fpAbre($('fnac'),'Fecha prevista de parto'));
+  $('obFppBtn').addEventListener('click',()=>fpAbre($('obFpp'),'Fecha prevista de parto'));
   $('fpAnt').addEventListener('click',()=>{FP.vista=new Date(FP.vista.getFullYear(),FP.vista.getMonth()-1,1); fpPinta();});
   $('fpSig').addEventListener('click',()=>{FP.vista=new Date(FP.vista.getFullYear(),FP.vista.getMonth()+1,1); fpPinta();});
   $('fpX').addEventListener('click',fpCierra);
@@ -4024,6 +4034,7 @@ async function init(){
   $('hojaFecha').addEventListener('keydown',ev=>{ if(ev.key==='Escape'){ev.stopPropagation(); fpCierra();} });
   $('hojaCA').addEventListener('keydown',ev=>{ if(ev.key==='Escape'){ev.stopPropagation(); caCierra();} });
   selPinta($('ca')); selPinta($('obCa'));
+  fechaPinta($('fnac')); fechaPinta($('obFpp'));
   $('obFpp').addEventListener('change',sugiereFruta);
   $('obApodo').addEventListener('input',sugiereFruta);
   document.querySelectorAll('input[name="obDoc"]').forEach(r=>r.addEventListener('change',pintaQuienDoc));
@@ -4127,6 +4138,14 @@ if('serviceWorker' in navigator && location.protocol!=='file:'){
     if(window.caches&&caches.keys) caches.keys().then(ks=>ks.forEach(k=>caches.delete(k))).catch(()=>{});
   }else{
     window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+    /* El sw hace skipWaiting+claim: al publicar versión, el nuevo toma el control de esta
+       pestaña YA ABIERTA y borra la caché vieja — quedaría el HTML viejo sobre cachés
+       nuevas y el diseño cambiaría bajo el dedo. Al relevo, recarga y a la versión nueva.
+       Solo si la página YA estaba controlada: el primer install no debe recargar. */
+    const teniaSW=!!navigator.serviceWorker.controller; let relevo=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(teniaSW&&!relevo){ relevo=true; location.reload(); }
+    });
   }
 }
 </script>
