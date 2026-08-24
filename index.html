@@ -22,8 +22,33 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://allonest.es/#org",
+      "name": "Allonest",
+      "url": "https://allonest.es/",
+      "logo": { "@type": "ImageObject", "url": "https://allonest.es/icono-512.png" },
+      "email": "selgasignacio@gmail.com",
+      "areaServed": "ES"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://allonest.es/#web",
+      "name": "Allonest",
+      "url": "https://allonest.es/",
+      "inLanguage": "es",
+      "publisher": { "@id": "https://allonest.es/#org" }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "Allonest",
+  "author": { "@id": "https://allonest.es/#org" },
   "operatingSystem": "Android, iOS, Web",
   "applicationCategory": "LifestyleApplication",
   "description": "Planificador de la baja parental —el permiso por nacimiento y cuidado del menor— en España (RDL 9/2025): reparte las 19 semanas de cada progenitor, con calendario compartido en pareja, lista del bebé y PDF para la empresa.",
@@ -187,7 +212,7 @@ footer p+p{margin-top:8px}
   <header class="hero">
     <div class="hero-tx">
       <p class="marca"><img src="logo.svg" alt="" width="52" height="52" aria-hidden="true"><span translate="no">Allonest</span></p>
-      <h1>El permiso de nacimiento, repartido entre los dos</h1>
+      <h1>La baja parental, repartida entre los dos</h1>
       <p class="sub">La <strong>baja parental</strong> son 19 semanas por progenitor, y colocarlas bien no es obvio. Allonest las reparte sobre un calendario que enseña dónde quedan huecos sin cubrir, compartido con tu pareja, con la lista del bebé y el PDF para la empresa.</p>
       <div class="tiendas">
         <a class="tienda" href="#preguntas" aria-describedby="notaPronto">
