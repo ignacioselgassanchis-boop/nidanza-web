@@ -345,6 +345,11 @@ button.enlace:focus-visible{outline:2px solid var(--azul);outline-offset:2px;bor
   font-size:10.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--tinta2)}
 .au-o::before,.au-o::after{content:"";flex:1;height:1px;background:var(--linea)}
 .au-links{display:flex;flex-direction:column;align-items:flex-start;gap:2px;margin-top:14px}
+/* la letra pequeña legal: las tiendas exigen estos enlaces DENTRO de la app */
+.au-legal{margin-top:16px;font-size:11.5px;line-height:1.5;font-weight:600;color:var(--tinta2)}
+a.lex{color:inherit;text-decoration:underline;text-underline-offset:2px}
+a.lex:hover{color:var(--tinta)}
+a.lex:focus-visible{outline:2px solid var(--azul);outline-offset:2px;border-radius:4px}
 .au-nota{margin:18px 0 0;font-size:11.5px;line-height:1.5;font-weight:600;color:var(--tinta2)}
 .au-ok{margin:0 0 12px;font-size:13px;line-height:1.5;font-weight:700;color:#2E827D}
 
@@ -759,6 +764,12 @@ html,body{overscroll-behavior-y:contain}
     <ul>
       <li><b>Nunito</b> — Copyright 2014 The Nunito Project Authors, bajo la <b>SIL Open Font License 1.1</b>. Va incluida en la aplicación; el texto completo de la licencia está en <span class="mono">fonts/OFL.txt</span>.</li>
     </ul>
+    <h2>Lo legal, con todas las letras</h2>
+    <p>Lo de arriba es el resumen honesto; el documento formal está publicado en la web y se abre en tu navegador:</p>
+    <ul>
+      <li><a class="lex" href="https://allonest.es/privacidad/" target="_blank" rel="noopener">Política de privacidad</a></li>
+      <li><a class="lex" href="https://allonest.es/terminos/" target="_blank" rel="noopener">Aviso legal y condiciones de uso</a></li>
+    </ul>
   </div>
 </aside>
 
@@ -958,6 +969,7 @@ html,body{overscroll-behavior-y:contain}
       <button type="button" class="enlace" id="btIrCrear">Crear una cuenta</button>
       <button type="button" class="enlace" id="btIrRecuperar">He olvidado la contraseña</button>
     </div>
+    <p class="au-legal">Al entrar aceptas las <a class="lex" href="https://allonest.es/terminos/" target="_blank" rel="noopener">condiciones de uso</a> y la <a class="lex" href="https://allonest.es/privacidad/" target="_blank" rel="noopener">política de privacidad</a>.</p>
   </section>
 
   <form class="paso" id="authCrear" hidden novalidate>
@@ -986,6 +998,7 @@ html,body{overscroll-behavior-y:contain}
       <button type="submit" class="cta" id="btCrear">Crear cuenta</button>
       <button type="button" class="enlace" data-auth-volver>Ya tengo cuenta</button>
     </div>
+    <p class="au-legal">Al crear la cuenta aceptas las <a class="lex" href="https://allonest.es/terminos/" target="_blank" rel="noopener">condiciones de uso</a> y la <a class="lex" href="https://allonest.es/privacidad/" target="_blank" rel="noopener">política de privacidad</a>.</p>
   </form>
 
   <section class="paso" id="authAviso" hidden>
@@ -4054,6 +4067,14 @@ async function init(){
   $('abreAjustes').addEventListener('click',()=>{sincronizaAjustes(); abreHoja('hojaAjustes');});
   $('abreGuia').addEventListener('click',()=>abreHoja('hojaGuia'));
   $('abreInfo').addEventListener('click',()=>abreHoja('hojaInfo'));
+  /* Enlaces legales (.lex): en web el target=_blank basta, pero en nativo navegarían
+     DENTRO del WebView y se comerían la app — van por Custom Tabs, como el login. */
+  if(nativo) document.addEventListener('click',ev=>{
+    const a=ev.target.closest&&ev.target.closest('a.lex'); if(!a) return;
+    ev.preventDefault();
+    const B=plug('Browser');
+    if(B) B.open({url:a.href}); else window.open(a.href,'_blank','noopener');
+  });
   $('abreExp').addEventListener('click',()=>{
     if(!CONFIG){ hint('Primero dinos la fecha de parto.'); return; }
     pintaExp(); abreHoja('hojaExp');
