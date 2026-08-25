@@ -499,7 +499,8 @@ html,body{overscroll-behavior-y:contain}
         <section class="tarjeta b8" id="b8"></section>
         <section class="tarjeta"><div class="tit-b">Cómo queda el año</div><div class="res" id="res"></div></section>
         <section class="tarjeta"><div class="tit-b">Las 52 semanas de un vistazo</div>
-          <div class="cinta-box"><div class="cinta" id="cinta"></div></div></section>
+          <div class="cinta-box"><div class="cinta" id="cinta"></div></div>
+          <button type="button" class="mini" id="btAnualCinta" style="margin-top:10px">Descargar el año en A4</button></section>
         <section class="tarjeta"><div class="tit-b">Qué es cada color</div><div class="leyenda" id="leyenda"></div></section>
         <footer>
           Created by
@@ -4309,7 +4310,9 @@ async function exportarAnual(){
   cierraHoja();
   if(await compartirBin(btoa(txt),nom,'El primer año de un vistazo')){ hint('PDF listo para enviar o imprimir: '+nom); return; }
   const bytes=Uint8Array.from(txt,c=>c.charCodeAt(0));
-  if(await compartirWeb(bytes,nom,'application/pdf')){ hint('PDF compartido: '+nom); return; }
+  // en el móvil, la hoja de compartir; en el ordenador, descarga directa (Windows también «comparte» y despistaba)
+  const movil=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if(movil&&await compartirWeb(bytes,nom,'application/pdf')){ hint('PDF compartido: '+nom); return; }
   descarga(bytes,nom,'application/pdf');
   hint('Descargado '+nom+'. Es un A4 apaisado: imprímelo tal cual.');
 }
@@ -4522,6 +4525,7 @@ async function init(){
   $('btGcal').addEventListener('click',exportarGcal);
   $('btPdf').addEventListener('click',exportarPdf);
   $('btAnual').addEventListener('click',exportarAnual);
+  $('btAnualCinta').addEventListener('click',exportarAnual);
   document.querySelectorAll('[data-cerrar]').forEach(b=>b.addEventListener('click',cierraHoja));
   $('fondo').addEventListener('click',cierraHoja);
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') cierraHoja(); });
