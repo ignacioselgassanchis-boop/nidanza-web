@@ -595,6 +595,14 @@ html,body{overscroll-behavior-y:contain}
           <option value="mono">Monoparental · 32 semanas</option>
         </select>
       </label>
+      <label class="f">Bebés que nacen
+        <select id="hijos">
+          <option value="1">Uno</option>
+          <option value="2">Mellizos · 1 semana más cada uno</option>
+          <option value="3">Trillizos · 2 semanas más cada uno</option>
+        </select>
+      </label>
+      <label class="f chk"><input type="checkbox" id="disc">Hijo con discapacidad · 1 semana más cada uno</label>
     </div>
     <details class="plegable">
       <summary>Festivos locales de tu municipio (2 al año)</summary>
@@ -748,7 +756,7 @@ html,body{overscroll-behavior-y:contain}
     <button type="button" class="hoja-x" data-cerrar aria-label="Cerrar">✕</button></div>
   <div class="hoja-cuerpo notas">
     <ul>
-      <li><b>19 semanas por progenitor</b> desde el 1 de enero de 2026 (Real Decreto-ley 9/2025): 6 obligatorias, 11 flexibles hasta los 12 meses y 2 guardables hasta los 8 años. En familias monoparentales, 32 (28 en el primer año + 4 hasta los 8). Prestación del 100 % de la base reguladora.</li>
+      <li><b>19 semanas por progenitor</b> desde el 1 de enero de 2026 (Real Decreto-ley 9/2025): 6 obligatorias, 11 flexibles hasta los 12 meses y 2 guardables hasta los 8 años. En familias monoparentales, 32 (28 en el primer año + 4 hasta los 8). En partos múltiples, una semana más por progenitor por cada hijo a partir del segundo, y otra más si el hijo tiene discapacidad (art. 48.6 ET); en Ajustes se indica y el cupo crece solo. Prestación del 100 % de la base reguladora.</li>
       <li>Las semanas flexibles se disfrutan <b>en periodos semanales</b>, con 15 días de preaviso, y a jornada parcial solo si hay acuerdo con la empresa.</li>
       <li>La madre biológica puede adelantar hasta 4 semanas antes de la fecha prevista de parto. Este simulador arranca el día del nacimiento.</li>
       <li>Festivos de 2026: <b>Resolución de 17 de octubre de 2025 de la Dirección General de Trabajo</b> (BOE de 28/10/2025). Los dos festivos locales por municipio no salen ahí, los rellenas tú.</li>
@@ -1253,6 +1261,8 @@ const S={
   nac: iso(addDays(new Date(hoy.getFullYear(),hoy.getMonth(),hoy.getDate()),100)),
   ca:'cv', loc:['22/01','pascua+8'],
   familia:'bi', adic:false,
+  hijos:1,       // bebés que nacen: 2 = mellizos, 3 = trillizos (una semana más por cada uno a partir del segundo)
+  disc:false,    // hijo con discapacidad: una semana más (art. 48.6 ET)
   brush:{p:'a',t:'permiso'},
   a:{nom:'Progenitor A', sem:new Set(), vac:new Set(), lac:new Set(), vacTot:22, vacPrev:0, lacTot:15,
      doc:false, esc:{nadal:true,extra:true,pascua:true,verano:true,pf:8,vIni:'10/07',vFin:'01/09'}},
@@ -1267,7 +1277,8 @@ const S={
 const bi=()=>S.familia==='bi';
 // primer día en que el peque ya tiene 9 meses: la lactancia acumulada tiene que quedar antes
 const lim9=()=>{const n=parseISO(S.nac);return Math.round((new Date(n.getFullYear(),n.getMonth()+9,n.getDate())-n)/MS);};
-const cupoSem=()=>{const flex=bi()?11:22, ad=bi()?2:4; return {flex, ad:S.adic?ad:0, disp:flex+(S.adic?ad:0)};};
+const semExtra=()=>Math.max(0,(S.hijos||1)-1)+(S.disc?1:0);   // por progenitor: +1 por cada hijo desde el segundo, +1 por discapacidad
+const cupoSem=()=>{const base=bi()?11:22, extra=semExtra(), flex=base+extra, ad=bi()?2:4; return {base, extra, flex, ad:S.adic?ad:0, disp:flex+(S.adic?ad:0)};};
 // vacaciones disponibles = las del año + las que el embarazo o el permiso dejaron sin disfrutar (art. 38.3 ET).
 // Un docente no tiene bolsa anual (la suya es el calendario escolar), pero sí puede arrastrar días sin disfrutar:
 // si la baja por riesgo cayó en agosto, ese periodo vacacional se recupera en otra fecha igual que el de cualquiera.
@@ -1817,7 +1828,7 @@ function instantanea(){
   return {esquema:ESQUEMA,guardado:new Date().toISOString(),
           uid:(SES&&SES.user&&SES.user.id)||DUENO||null,
           nac:S.nac,ca:S.ca,loc:S.loc,
-          familia:S.familia,adic:S.adic,a:p('a'),b:p('b'),
+          familia:S.familia,adic:S.adic,hijos:S.hijos,disc:S.disc,a:p('a'),b:p('b'),
           perfil:{apodo:S.perfil.apodo,progenitores:S.perfil.progenitores.slice(0,2),
                   comunidad:S.perfil.comunidad,docente:S.perfil.docente,
                   docenteQuien:S.perfil.docenteQuien,onboardingHecho:S.perfil.onboardingHecho},
@@ -1898,6 +1909,8 @@ function aplica(d){
   if(!d||!d.nac||!CCAA[d.ca]) return false;
   S.nac=d.nac; S.ca=d.ca; S.familia=d.familia==='mono'?'mono':'bi';
   S.adic=d.adic!==false;   // un reparto guardado antes conserva su ajuste tal cual
+  S.hijos=[1,2,3].includes(+d.hijos)?+d.hijos:1;
+  S.disc=d.disc===true;
   S.loc=Array.isArray(d.loc)?d.loc.slice(0,2):S.loc;
   ['a','b'].forEach(k=>{
     const o=d[k]; if(!o) return;
@@ -2480,7 +2493,7 @@ function fusiona(base, rem, loc){
   const J=JSON.stringify;
   const esc=(b,r,l)=>J(l)!==J(b)?l:r;
   const out=JSON.parse(J(rem));
-  ['nac','ca','familia','adic','loc','perfil'].forEach(k=>{ out[k]=esc(base[k],rem[k],loc[k]); });
+  ['nac','ca','familia','adic','hijos','disc','loc','perfil'].forEach(k=>{ out[k]=esc(base[k],rem[k],loc[k]); });
   ['a','b'].forEach(k=>{
     const B=base[k]||{}, R=rem[k]||{}, L=loc[k]||{}, O=out[k]=out[k]||{};
     ['nom','vacTot','vacPrev','lacTot','doc','esc'].forEach(c=>{ O[c]=esc(B[c],R[c],L[c]); });
@@ -3012,8 +3025,9 @@ function pintaHojaBolsa(){
   let o='<div class="reglas">'+(REGLAS[t]||[]).map(r=>'<span>'+esc(r)+'</span>').join('')+'</div>';
   o+='<p>'+TIP[t]+'</p>';
   if(t==='permiso'){
-    const {flex,ad}=cupoSem();
-    o+='<p>Ahora mismo: <b>'+flex+' semanas</b> del primer año'+
+    const {base,extra,flex,ad}=cupoSem();
+    const porque=extra?' ('+base+' más '+extra+' por '+[S.hijos>1?(S.hijos===2?'parto de mellizos':'parto de trillizos'):'',S.disc?'discapacidad del hijo':''].filter(Boolean).join(' y ')+')':'';
+    o+='<p>Ahora mismo: <b>'+flex+' semanas</b> del primer año'+porque+
        (ad?' más las <b>'+ad+' de hasta los 8 años</b>, que has traído a este calendario':'')+
        '. Las 2 semanas que no caducan al año se manejan en su bloque, bajo el calendario.</p>';
   }
@@ -3153,7 +3167,7 @@ function pintaAjustes(){
   }));
 }
 function sincronizaAjustes(){
-  $('ca').value=S.ca; $('familia').value=S.familia; selPinta($('ca'));
+  $('ca').value=S.ca; $('familia').value=S.familia; $('hijos').value=String(S.hijos||1); $('disc').checked=!!S.disc; selPinta($('ca'));
   $('fnac').value=CONFIG?S.nac:''; fechaPinta($('fnac'));
   $('ajApodo').value=S.perfil.apodo;
   $('loc1').value=S.loc[0]||''; $('loc2').value=S.loc[1]||'';
@@ -3991,6 +4005,10 @@ async function init(){
     }
     render(); pintaAjustes();
   });
+  // más o menos semanas extra: si el cupo baja, sobran semanas ya puestas y se devuelven las últimas
+  const cambiaExtra=()=>{ recortaSem(S.a); recortaSem(S.b); render(); pintaAjustes(); };
+  $('hijos').addEventListener('change',()=>{ S.hijos=+$('hijos').value||1; cambiaExtra(); });
+  $('disc').addEventListener('change',()=>{ S.disc=$('disc').checked; cambiaExtra(); });
   $('btFecha').addEventListener('click',()=>{ sincronizaAjustes(); abreHoja('hojaAjustes'); $('fnacBtn').focus(); });
   $('btGuardar').addEventListener('click',()=>{
     if(!CONFIG){ hint('Falta la fecha de parto: sin ella no hay calendario que repartir.'); $('fnacBtn').focus(); return; }
