@@ -687,6 +687,7 @@ html,body{overscroll-behavior-y:contain}
     <p class="aj-nota" id="expNota"></p>
     <button type="button" class="cta" id="btGcal" style="width:100%;margin-top:14px">Enviar a Google Calendar</button>
     <button type="button" class="cta" id="btPdf" style="width:100%;margin-top:9px">PDF para la empresa</button>
+    <button type="button" class="cta" id="btAnual" style="width:100%;margin-top:9px;background:var(--azulF)">El año de un vistazo (A4)</button>
     <button type="button" class="mini" id="btIcs" style="width:100%;margin-top:9px">Solo descargar el .ics</button>
   </div>
 </aside>
@@ -4002,22 +4003,23 @@ const pdfEsc=s=>pdfLatin1(s).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(
 const pdfFecha=d=>String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
 const pdfLarga=d=>d.getDate()+' de '+MESES[d.getMonth()]+' de '+d.getFullYear();
 /* lienzo mínimo: páginas como listas de operadores, con la y medida desde arriba */
-function pdfNuevo(){
-  const D={pags:[],ops:null};
-  D.pagina=()=>{D.ops=[PDF_CREMA+' rg 0 0 '+PDF_W+' '+PDF_H+' re f'];D.pags.push(D.ops);};   // papel crema
+function pdfNuevo(w,h){
+  const D={pags:[],ops:null,w:w||PDF_W,h:h||PDF_H};   // A4 vertical de serie; apaisado si se pide
+  D.pagina=()=>{D.ops=[PDF_CREMA+' rg 0 0 '+D.w+' '+D.h+' re f'];D.pags.push(D.ops);};   // papel crema
+  D.rect=(x,y,w,h,rgb)=>{D.ops.push(rgb+' rg '+x.toFixed(2)+' '+(D.h-y-h).toFixed(2)+' '+w.toFixed(2)+' '+h.toFixed(2)+' re f');};
   D.txt=(x,y,s,t)=>{t=t||{};
     D.ops.push('BT /F'+(t.b?'2':'1')+' '+(t.tam||9.5)+' Tf '+(t.rgb||PDF_TINTA)+' rg 1 0 0 1 '+
-               x.toFixed(2)+' '+(PDF_H-y).toFixed(2)+' Tm ('+pdfEsc(s)+') Tj ET');};
+               x.toFixed(2)+' '+(D.h-y).toFixed(2)+' Tm ('+pdfEsc(s)+') Tj ET');};
   // las líneas en los tonos de la retícula: marcadas las de estructura, suaves las de filas
   D.linea=(x1,y1,x2,y2,g)=>{const t=(g!=null&&+g<=0.6)?'0.788 0.671 0.502':'0.922 0.839 0.706';
-    D.ops.push(t+' RG 0.7 w '+x1+' '+(PDF_H-y1).toFixed(2)+
-               ' m '+x2+' '+(PDF_H-y2).toFixed(2)+' l S');};
+    D.ops.push(t+' RG 0.7 w '+x1+' '+(D.h-y1).toFixed(2)+
+               ' m '+x2+' '+(D.h-y2).toFixed(2)+' l S');};
   D.pagina();
   return D;
 }
 /* el logo del nido, dibujado en vectores PDF (mismas curvas Bézier que el SVG de marca) */
 function pdfLogo(D,x,yTop,tam){
-  const s=tam/512, X=v=>(x+v*s).toFixed(2), Y=v=>(PDF_H-(yTop+v*s)).toFixed(2);
+  const s=tam/512, X=v=>(x+v*s).toFixed(2), Y=v=>(D.h-(yTop+v*s)).toFixed(2);
   const cur=p=>p.map(g=>g[0]==='M'?X(g[1])+' '+Y(g[2])+' m':
     X(g[1])+' '+Y(g[2])+' '+X(g[3])+' '+Y(g[4])+' '+X(g[5])+' '+Y(g[6])+' c').join(' ');
   const HUEVO=[['M',256,112],['C',206,112,176,164,176,220],['C',176,276,212,312,256,312],['C',300,312,336,276,336,220],['C',336,164,306,112,256,112]];
@@ -4042,7 +4044,7 @@ function pdfArchivo(D){
   objs[4]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
   D.pags.forEach((ops,i)=>{
     const cont=ops.join('\n');
-    objs[5+i*2]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+PDF_W+' '+PDF_H+'] '+
+    objs[5+i*2]='<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+D.w+' '+D.h+'] '+
       '/Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents '+(6+i*2)+' 0 R >>';
     objs[6+i*2]='<< /Length '+cont.length+' >>\nstream\n'+cont+'\nendstream';
   });
@@ -4111,6 +4113,109 @@ function construyePDF(secciones,nac,gen){
     D.txt(PDF_MI,PDF_H-30,'Planificación orientativa, no una comunicación oficial: contrasta las fechas con RRHH y la Seguridad Social.',{tam:7.5,rgb:PDF_GRIS});
     D.txt(498,PDF_H-30,'pág. '+(i+1)+' de '+total,{tam:7.5,rgb:PDF_GRIS});
   });
+  return pdfArchivo(D);
+}
+
+/* ===== el año de un vistazo, en A4 apaisado =====
+   La misma cinta que hay bajo el calendario, pero día a día y en papel: una fila por
+   progenitor, la cobertura del bebé, las cifras clave y la leyenda. Solo depende de lo
+   que recibe (nada de S), para poder probarse. */
+const AN_COL={
+  obl:{a:'0.13 0.29 0.52',b:'0.05 0.36 0.33'}, permiso:{a:'0.204 0.396 0.663',b:'0.078 0.478 0.443'},
+  auto:{a:'0.71 0.80 0.92',b:'0.62 0.82 0.80'},
+  vac:'0.937 0.686 0.333', lact:'0.910 0.573 0.420', esc:'0.60 0.68 0.62',
+  cubierto:'0.36 0.62 0.45', hueco:'0.784 0.322 0.235', finde:'0.93 0.90 0.85', fest:'0.78 0.60 0.40'
+};
+function construyeAnual(R,claves,nombres,apodo,gen,cupo){
+  const D=pdfNuevo(842,595);
+  const W=D.w, H=D.h, MI=40, MD=W-40;
+  const nac=R.nac, N=364, X0=MI+96, X1=MD, dw=(X1-X0)/N;
+  const xd=i=>X0+i*dw;
+  const finde=d=>{const g=d.getDay();return g===0||g===6;};
+  const nomDe=k=>nombres[k]||('Progenitor '+k.toUpperCase());
+  // cabecera
+  pdfLogo(D,MI,34,30);
+  D.txt(MI+38,55,'Allonest',{b:1,tam:12});
+  D.txt(MI,88,(apodo?'El primer año de '+apodo:'El primer año')+': las 52 semanas de un vistazo',{b:1,tam:16});
+  D.txt(MI,104,'Nacimiento el '+pdfLarga(nac)+' · generado el '+pdfLarga(gen),{tam:9,rgb:PDF_GRIS});
+  D.linea(MI,112,MD,112);
+  // regla de meses
+  let y=132, prev=-1;
+  for(let i=0;i<N;i++){
+    const d=addDays(nac,i);
+    if(d.getMonth()!==prev){
+      prev=d.getMonth();
+      D.ops.push('0.788 0.671 0.502 RG 0.5 w '+xd(i).toFixed(2)+' '+(H-y-4).toFixed(2)+' m '+xd(i).toFixed(2)+' '+(H-y+8).toFixed(2)+' l S');
+      D.txt(xd(i)+3,y,MESES[prev].slice(0,3)+(prev===0||i===0?' '+d.getFullYear():''),{tam:7.5,b:1,rgb:PDF_GRIS});
+    }
+  }
+  // fondo de findes y marcas de festivos, para todas las filas
+  y=142;
+  const filas=claves.length+1, altoFila=40, gap=8;
+  const yLanes=y+14, yFin=yLanes+filas*(altoFila+gap)-gap;
+  for(let i=0;i<N;i++){
+    const d=addDays(nac,i);
+    if(finde(d)) D.rect(xd(i),yLanes,dw,yFin-yLanes,AN_COL.finde);
+  }
+  for(let i=0;i<N;i++) if(R.dias[i]&&R.dias[i].f) D.rect(xd(i),y,dw,8,AN_COL.fest);
+  D.txt(MI,y+7,'festivos',{tam:7.5,rgb:PDF_GRIS});
+  // una fila por progenitor, día a día
+  y=yLanes;
+  claves.forEach(k=>{
+    D.txt(MI,y+altoFila/2+3,nomDe(k).slice(0,18),{tam:8.5,b:1,rgb:AN_COL.permiso[k]});
+    for(let i=0;i<N;i++){
+      const e=R.dias[i]&&R.dias[i][k]; if(!e) continue;
+      const col=e==='obl'?AN_COL.obl[k]:e==='permiso'?AN_COL.permiso[k]:e==='auto'?AN_COL.auto[k]:AN_COL[e];
+      if(col) D.rect(xd(i),y+3,dw+0.2,altoFila-6,col);
+    }
+    y+=altoFila+gap;
+  });
+  // cobertura: laborables con alguien en casa / huecos
+  D.txt(MI,y+altoFila/2+3,'bebé cubierto',{tam:8.5,b:1,rgb:PDF_GRIS});
+  let huecos=0;
+  for(let i=0;i<N;i++){
+    const x=R.dias[i]; if(!x) continue;
+    const alguien=claves.some(k=>x[k]);
+    if(alguien) D.rect(xd(i),y+9,dw+0.2,altoFila-18,AN_COL.cubierto);
+    else if(!finde(x.d)&&!x.f){ D.rect(xd(i),y+9,dw+0.2,altoFila-18,AN_COL.hueco); huecos++; }
+  }
+  y+=altoFila+gap;
+  // marco de semanas (cada 4) para leer el eje
+  for(let w=0;w<=52;w+=4){
+    const x=xd(Math.min(w*7,N));
+    D.ops.push('0.922 0.839 0.706 RG 0.4 w '+x.toFixed(2)+' '+(H-yLanes).toFixed(2)+' m '+x.toFixed(2)+' '+(H-yFin).toFixed(2)+' l S');
+    if(w<52) D.txt(x+2,yFin+11,'sem '+(w+1),{tam:6.5,rgb:PDF_GRIS});
+  }
+  // cifras clave
+  y=yFin+34;
+  D.linea(MI,y,MD,y); y+=18;
+  D.txt(MI,y,'Las cuentas',{b:1,tam:11}); y+=16;
+  const cuenta=(k)=>{
+    let obl=0,perm=0,vac=0,lact=0;
+    for(let i=0;i<N;i++){const e=R.dias[i]&&R.dias[i][k]; if(e==='obl')obl++; else if(e==='permiso')perm++; else if(e==='vac')vac++; else if(e==='lact')lact++;}
+    return {sem:Math.round((obl+perm)/7), vac, lact};
+  };
+  const colx=[MI,MI+150,MI+300,MI+420,MI+560];
+  ['','Semanas de permiso','Vacaciones','Lactancia','Vuelve al trabajo'].forEach((h,i)=>D.txt(colx[i],y,h,{tam:8,b:1,rgb:PDF_GRIS}));
+  y+=4; D.linea(MI,y,MD,y,'0.6'); y+=13;
+  claves.forEach(k=>{
+    const c=cuenta(k), v=k==='a'?R.vueltaA:R.vueltaB;
+    D.txt(colx[0],y,nomDe(k),{b:1,rgb:AN_COL.permiso[k]});
+    D.txt(colx[1],y,c.sem+(cupo?' de '+(6+cupo):'')+' semanas');
+    D.txt(colx[2],y,c.vac+' días'); D.txt(colx[3],y,c.lact+' días');
+    D.txt(colx[4],y,v?pdfLarga(v):'no vuelve en el primer año');
+    y+=15;
+  });
+  y+=6;
+  D.txt(MI,y,huecos?('Días laborables sin nadie en casa: '+huecos+'.'):'Ningún día laborable sin nadie en casa.',{b:1,rgb:huecos?AN_COL.hueco:AN_COL.cubierto});
+  // leyenda
+  y+=26;
+  const leg=[['obligatorio',AN_COL.obl.a],['permiso flexible',AN_COL.permiso.a],['vacaciones',AN_COL.vac],['lactancia acumulada',AN_COL.lact]];
+  if(claves.some(k=>{for(let i=0;i<N;i++) if(R.dias[i]&&R.dias[i][k]==='esc') return true; return false;})) leg.push(['calendario escolar',AN_COL.esc]);
+  leg.push(['cubierto',AN_COL.cubierto],['hueco',AN_COL.hueco]);
+  let lx=MI;
+  leg.forEach(l=>{ D.rect(lx,y-7,9,9,l[1]); D.txt(lx+13,y,l[0],{tam:8,rgb:PDF_GRIS}); lx+=13+l[0].length*4.6+18; });
+  D.txt(MI,H-26,'Planificación orientativa, no una comunicación oficial: contrasta las fechas con RRHH y la Seguridad Social.',{tam:7.5,rgb:PDF_GRIS});
   return pdfArchivo(D);
 }
 /* === /bloque:pdf === */
@@ -4195,6 +4300,18 @@ async function exportarPdf(){
   if(await compartirWeb(bytes,nom,'application/pdf')){ hint('PDF compartido: '+nom); return; }
   descarga(bytes,nom,'application/pdf');
   hint('Descargado '+nom+'.');
+}
+
+async function exportarAnual(){
+  const R=calcular(), claves=clavesExp();
+  const txt=construyeAnual(R,claves,{a:S.a.nom,b:S.b.nom},S.perfil.apodo,new Date(),cupoSem().disp);
+  const nom='primer-ano-'+limpiaNombre(S.perfil.apodo||'bebe')+'-'+S.nac+'.pdf';
+  cierraHoja();
+  if(await compartirBin(btoa(txt),nom,'El primer año de un vistazo')){ hint('PDF listo para enviar o imprimir: '+nom); return; }
+  const bytes=Uint8Array.from(txt,c=>c.charCodeAt(0));
+  if(await compartirWeb(bytes,nom,'application/pdf')){ hint('PDF compartido: '+nom); return; }
+  descarga(bytes,nom,'application/pdf');
+  hint('Descargado '+nom+'. Es un A4 apaisado: imprímelo tal cual.');
 }
 
 /* ===== arranque ===== */
@@ -4404,6 +4521,7 @@ async function init(){
   $('btIcs').addEventListener('click',exportarIcs);
   $('btGcal').addEventListener('click',exportarGcal);
   $('btPdf').addEventListener('click',exportarPdf);
+  $('btAnual').addEventListener('click',exportarAnual);
   document.querySelectorAll('[data-cerrar]').forEach(b=>b.addEventListener('click',cierraHoja));
   $('fondo').addEventListener('click',cierraHoja);
   document.addEventListener('keydown',e=>{ if(e.key==='Escape') cierraHoja(); });
