@@ -409,6 +409,9 @@ a.lex:focus-visible{outline:2px solid var(--azul);outline-offset:2px;border-radi
 .lst-cab .cnt{font-size:12.5px;font-weight:800;color:var(--tinta2);white-space:nowrap}
 .lst-acciones{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 2px}
 .lst-sem{margin:16px 0 7px;font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--tinta2);display:flex;gap:8px;align-items:baseline}
+.lst-cat{margin:9px 0 3px 38px;font-size:11.5px;font-weight:800;color:var(--tinta2)}
+.art-sem{color:var(--tinta2);font-weight:700}
+.seg-lista{margin:8px 0 2px;--sc:var(--c1)}
 .lst-sem .ahora{color:var(--azul)}
 .art{display:flex;align-items:flex-start;gap:10px;background:var(--papel2);border:1px solid var(--linea);border-radius:11px;padding:9px 11px;margin-bottom:7px}
 .art.hecho{opacity:.55}
@@ -513,6 +516,10 @@ html,body{overscroll-behavior-y:contain}
         <div class="lst-acciones">
           <button type="button" class="cta" id="btEnviarLista" style="padding:10px 18px;font-size:14px">Enviar la lista</button>
           <button type="button" class="mini" id="btNuevoItem">Añadir algo</button>
+        </div>
+        <div class="seg seg-lista" id="lstModo" role="group" aria-label="Cómo ordenar la lista">
+          <button type="button" data-modo="sem" aria-pressed="true">Por semana</button>
+          <button type="button" data-modo="cat" aria-pressed="false">Por temática</button>
         </div>
         <div id="lstGrupos"></div>
         <details class="plegable" id="lstDescartados" hidden>
@@ -802,6 +809,9 @@ html,body{overscroll-behavior-y:contain}
       </label>
       <label class="f">Para la semana
         <select id="itSem"></select>
+      </label>
+      <label class="f">Temática
+        <select id="itCat"></select>
       </label>
       <label class="f">Precio orientativo (opcional)
         <input type="text" id="itPrecio" maxlength="20" autocomplete="off" placeholder="p. ej. 30-60 €">
@@ -1925,7 +1935,7 @@ function aplica(d){
       estado:est,
       propios:Array.isArray(d.lista.propios)
         ?d.lista.propios.filter(x=>x&&x.id&&x.nombre).map(x=>({
-           id:String(x.id).slice(0,24),nombre:String(x.nombre).slice(0,60),sem:+x.sem||40,
+           id:String(x.id).slice(0,24),nombre:String(x.nombre).slice(0,60),sem:+x.sem||40,cat:String(x.cat||'').slice(0,20),
            precio:String(x.precio||'').slice(0,20),url:String(x.url||'').slice(0,300)}))
         :[]
     };
@@ -3362,56 +3372,62 @@ const AFILIADO='allonest07-21';   // tag de afiliado de Amazon (p. ej. 'kumquat-
 const enlaceEj=e=>e.url?e.url
   :'https://www.amazon.es/s?k='+encodeURIComponent(e.q)+(AFILIADO?'&tag='+encodeURIComponent(AFILIADO):'');
 const CATALOGO=[
- {id:'cojin-embarazo',sem:16,nombre:'Cojín de embarazo y lactancia',precio:'25-50 €',ejemplos:[{t:'Koala Babycare',q:'koala babycare cojin embarazo lactancia'},{t:'Niimo',q:'niimo cojin embarazo'}]},
- {id:'ropa-premama',sem:16,nombre:'Ropa premamá básica',precio:'40-80 €',ejemplos:[{t:'vaqueros premamá',q:'pantalon premama'},{t:'leggings',q:'leggings premama algodon'}]},
- {id:'minicuna',sem:20,nombre:'Minicuna de colecho',precio:'90-250 €',ejemplos:[{t:'Chicco Next2Me Magic',q:'chicco next2me magic'},{t:'Maxi-Cosi Iora',q:'maxi-cosi iora colecho'}]},
- {id:'colchon-minicuna',sem:20,nombre:'Colchón y sábanas de minicuna',precio:'30-60 €',ejemplos:[{t:'colchón',q:'colchon minicuna colecho'},{t:'sábanas',q:'sabanas minicuna colecho'}]},
- {id:'cambiador',sem:20,nombre:'Cambiador',precio:'20-45 €',ejemplos:[{t:'con bordes rígidos',q:'cambiador bebe rigido'}]},
- {id:'protector-colchon',sem:20,nombre:'Protector de colchón impermeable',precio:'10-25 €',ejemplos:[{t:'minicuna',q:'protector colchon minicuna impermeable'},{t:'cuna 60×120',q:'protector colchon cuna 60x120 impermeable'}]},
- {id:'organizador-cambiador',sem:20,nombre:'Cestas del cambiador (pañales y cremas)',precio:'15-30 €',ejemplos:[{t:'cestas',q:'cesta organizador panales cambiador'}]},
- {id:'carrito',sem:24,nombre:'Carrito de paseo (dúo o trío)',precio:'350-900 €',ejemplos:[{t:'Bugaboo Fox',q:'bugaboo fox 5'},{t:'Cybex Priam',q:'cybex priam'},{t:'Kinderkraft (económico)',q:'kinderkraft carrito 3 en 1'}]},
- {id:'silla-coche',sem:24,nombre:'Silla de coche grupo 0 (i-Size)',precio:'150-350 €',ejemplos:[{t:'Cybex Aton B2',q:'cybex aton b2 i-size'},{t:'Maxi-Cosi CabrioFix',q:'maxi-cosi cabriofix i-size'}]},
- {id:'vigilabebes',sem:24,nombre:'Vigilabebés',precio:'40-180 €',ejemplos:[{t:'Philips Avent',q:'philips avent vigilabebes'},{t:'con cámara',q:'vigilabebes camara'}]},
- {id:'espejo-retrovisor',sem:24,nombre:'Espejo retrovisor para ver al bebé',precio:'10-20 €',ejemplos:[{t:'espejo 360°',q:'espejo retrovisor bebe coche'}]},
- {id:'accesorios-carro',sem:24,nombre:'Accesorios del carro (bolso, ganchos, mosquitera)',precio:'25-60 €',ejemplos:[{t:'bolso organizador',q:'bolso carrito bebe organizador'},{t:'ganchos',q:'ganchos carrito bebe'},{t:'mosquitera',q:'mosquitera carrito bebe universal'}]},
- {id:'cambiador-paseo',sem:24,nombre:'Cambiador de paseo y pañalera',precio:'15-35 €',ejemplos:[{t:'cambiador plegable',q:'cambiador bebe portatil plegable'},{t:'pañalera',q:'panalera neceser bebe'}]},
- {id:'banera',sem:28,nombre:'Bañera de bebé',precio:'25-60 €',ejemplos:[{t:'Stokke Flexi Bath',q:'stokke flexi bath'},{t:'OK Baby Onda',q:'ok baby onda banera'},{t:'esponja natural',q:'esponja natural bebe recien nacido'}]},
- {id:'bodies',sem:28,nombre:'Bodies 0-3 meses (6-8 uds.)',precio:'25-40 €',ejemplos:[{t:'pack de algodón',q:'bodies bebe 0-3 meses algodon'}]},
- {id:'pijamas',sem:28,nombre:'Pijamas 0-3 meses (4-6 uds.)',precio:'25-45 €',ejemplos:[{t:'de algodón',q:'pijama bebe 0-3 meses algodon'}]},
- {id:'sacaleches',sem:28,nombre:'Sacaleches (si hay lactancia materna)',precio:'30-180 €',ejemplos:[{t:'Medela Swing Flex',q:'medela swing flex'},{t:'manual Philips Avent',q:'philips avent sacaleches manual'}]},
- {id:'biberones',sem:28,nombre:'Biberones y tetinas talla 0',precio:'15-35 €',ejemplos:[{t:'Philips Avent Natural',q:'philips avent natural biberon recien nacido'},{t:'Suavinex',q:'suavinex biberon recien nacido'}]},
- {id:'toallas-capucha',sem:28,nombre:'Toallas con capucha (2-3 uds.)',precio:'15-30 €',ejemplos:[{t:'de algodón',q:'toalla capucha bebe algodon'}]},
- {id:'hamaca',sem:28,nombre:'Hamaca',precio:'60-200 €',ejemplos:[{t:'BabyBjörn Bliss',q:'hamaca bebe babybjorn'},{t:'económica',q:'hamaca bebe reclinable'}]},
- {id:'esterilizador',sem:28,nombre:'Esterilizador de biberones (si hay biberón)',precio:'30-70 €',ejemplos:[{t:'eléctrico',q:'esterilizador biberones'},{t:'para microondas',q:'esterilizador biberones microondas'}]},
- {id:'baberos',sem:28,nombre:'Baberos pequeños (6-8 uds.)',precio:'10-20 €',ejemplos:[{t:'de algodón',q:'baberos bebe recien nacido algodon'},{t:'de rizo',q:'baberos rizo bebe pack'}]},
- {id:'luz-nocturna',sem:28,nombre:'Luz nocturna para las tomas',precio:'15-30 €',ejemplos:[{t:'regulable',q:'luz nocturna bebe regulable'}]},
- {id:'accesorios-biberon',sem:28,nombre:'Accesorios del biberón (escurridor, dosificador, termo)',precio:'25-50 €',ejemplos:[{t:'escurrebiberones',q:'escurridor biberones plegable'},{t:'dosificador de leche',q:'dosificador leche polvo bebe'},{t:'termo',q:'termo biberon bebe'}]},
- {id:'bolsa-hospital',sem:32,nombre:'Bolsa del hospital',precio:'30-70 €',ejemplos:[{t:'bolsa de maternidad',q:'bolsa maternidad hospital'}]},
- {id:'muselinas',sem:32,nombre:'Gasas y muselinas (8-10 uds.)',precio:'15-30 €',ejemplos:[{t:'Aden + Anais',q:'aden anais muselina'},{t:'pack de gasas',q:'muselinas bebe algodon pack'}]},
- {id:'portabebes',sem:32,nombre:'Fular o mochila de porteo',precio:'30-180 €',ejemplos:[{t:'Ergobaby Omni',q:'ergobaby omni breeze'},{t:'fular elástico',q:'fular portabebes elastico'}]},
- {id:'termometro',sem:32,nombre:'Termómetro',precio:'10-45 €',ejemplos:[{t:'Braun ThermoScan',q:'braun thermoscan 7'}]},
- {id:'aspirador-nasal',sem:32,nombre:'Aspirador nasal',precio:'8-20 €',ejemplos:[{t:'NoseFrida',q:'nosefrida aspirador nasal'}]},
- {id:'kit-lactancia',sem:32,nombre:'Kit de lactancia (discos, pezoneras, lanolina)',precio:'20-40 €',ejemplos:[{t:'lanolina',q:'lanolina pezones lactancia'},{t:'discos de lactancia',q:'discos lactancia desechables'},{t:'bolsas de leche',q:'bolsas conservacion leche materna'}]},
- {id:'posparto-mama',sem:32,nombre:'Kit posparto para la madre',precio:'20-40 €',ejemplos:[{t:'kit posparto',q:'compresas postparto braguitas desechables'},{t:'empapadores',q:'empapadores desechables cama'}]},
- {id:'detergente-bebe',sem:32,nombre:'Detergente de bebé y quitamanchas',precio:'10-20 €',ejemplos:[{t:'Norit Bebé',q:'norit bebe detergente'},{t:'quitamanchas',q:'quitamanchas ropa bebe'}]},
- {id:'ropa-lactancia-mama',sem:32,nombre:'Camisón de lactancia y bata',precio:'30-60 €',ejemplos:[{t:'camisón de lactancia',q:'camison lactancia premama'},{t:'bata',q:'bata premama hospital'}]},
- {id:'cubre-lactancia',sem:32,nombre:'Cubre para dar el pecho fuera de casa',precio:'15-30 €',ejemplos:[{t:'pañuelo de lactancia',q:'cubre lactancia pañuelo'}]},
- {id:'panales',sem:36,nombre:'Pañales talla 1 (1-2 paquetes)',precio:'10-20 €',ejemplos:[{t:'Dodot Sensitive',q:'dodot sensitive talla 1'},{t:'Pingo (eco)',q:'pingo panales talla 1'}]},
- {id:'crema-panal',sem:36,nombre:'Crema del pañal',precio:'6-12 €',ejemplos:[{t:'Mustela 123',q:'mustela bebe crema balsamo 123'},{t:'Weleda caléndula',q:'weleda calendula crema panal'}]},
- {id:'toallitas',sem:36,nombre:'Toallitas o algodón y agua',precio:'8-15 €',ejemplos:[{t:'WaterWipes',q:'waterwipes toallitas'}]},
- {id:'arrullo',sem:36,nombre:'Arrullo y saquito de dormir',precio:'20-45 €',ejemplos:[{t:'arrullo envolvente',q:'arrullo bebe recien nacido'},{t:'saco 0-6 meses',q:'saco dormir bebe 0-6 meses'}]},
- {id:'botiquin',sem:36,nombre:'Botiquín básico (suero, tijeritas, cepillo)',precio:'10-20 €',ejemplos:[{t:'suero monodosis',q:'suero fisiologico monodosis bebe'},{t:'set de cuidado',q:'set cuidado bebe recien nacido'}]},
- {id:'kit-farmacia',sem:36,nombre:'Kit de farmacia del ombligo',precio:'15-25 €',ejemplos:[{t:'clorhexidina',q:'clorhexidina cordon umbilical bebe'},{t:'gasas estériles',q:'gasas esteriles 10x10 bebe'}]},
- {id:'chupetes',sem:40,nombre:'Chupetes talla 0 (por si acaso)',precio:'6-12 €',ejemplos:[{t:'Suavinex Zero',q:'suavinex chupete zero'}]},
- {id:'primera-puesta',sem:40,nombre:'Conjunto de la primera puesta',precio:'15-30 €',ejemplos:[{t:'primera puesta',q:'primera puesta bebe hospital'}]},
- {id:'cuna',sem:40,nombre:'Cuna 60×120 y colchón (hacia los 4-6 meses)',precio:'120-300 €',ejemplos:[{t:'cuna de madera',q:'cuna bebe 60x120 madera'},{t:'colchón 60×120',q:'colchon cuna 60x120'},{t:'sábanas 60×120',q:'sabanas cuna 60x120 algodon'}]},
- {id:'trona',sem:40,nombre:'Trona (hacia los 6 meses)',precio:'80-300 €',ejemplos:[{t:'Stokke Tripp Trapp',q:'stokke tripp trapp trona'},{t:'económica',q:'trona bebe evolutiva'}]},
- {id:'cuna-viaje',sem:40,nombre:'Cuna de viaje, que hace de parque (más adelante)',precio:'60-150 €',ejemplos:[{t:'cuna de viaje',q:'cuna viaje parque bebe'}]},
- {id:'saco-silla',sem:40,nombre:'Saco para la silla de paseo (invierno)',precio:'40-90 €',ejemplos:[{t:'saco universal',q:'saco silla paseo bebe invierno universal'}]},
- {id:'portachupetes',sem:40,nombre:'Broche portachupetes',precio:'6-15 €',ejemplos:[{t:'broche',q:'broche portachupetes bebe'}]},
- {id:'juguetes-primeros',sem:40,nombre:'Primeros juguetes: sonajero y doudou',precio:'15-35 €',ejemplos:[{t:'sonajero',q:'sonajero bebe recien nacido'},{t:'doudou',q:'doudou bebe peluche apego'}]}
+ {id:'cojin-embarazo',sem:16,cat:'Mamá',nombre:'Cojín de embarazo y lactancia',precio:'25-50 €',ejemplos:[{t:'Koala Babycare',q:'koala babycare cojin embarazo lactancia'},{t:'Niimo',q:'niimo cojin embarazo'}]},
+ {id:'ropa-premama',sem:16,cat:'Mamá',nombre:'Ropa premamá básica',precio:'40-80 €',ejemplos:[{t:'vaqueros premamá',q:'pantalon premama'},{t:'leggings',q:'leggings premama algodon'}]},
+ {id:'minicuna',sem:20,cat:'Habitación',nombre:'Minicuna de colecho',precio:'90-250 €',ejemplos:[{t:'Chicco Next2Me Magic',q:'chicco next2me magic'},{t:'Maxi-Cosi Iora',q:'maxi-cosi iora colecho'}]},
+ {id:'colchon-minicuna',sem:20,cat:'Habitación',nombre:'Colchón y sábanas de minicuna',precio:'30-60 €',ejemplos:[{t:'colchón',q:'colchon minicuna colecho'},{t:'sábanas',q:'sabanas minicuna colecho'}]},
+ {id:'cambiador',sem:20,cat:'Habitación',nombre:'Cambiador',precio:'20-45 €',ejemplos:[{t:'con bordes rígidos',q:'cambiador bebe rigido'}]},
+ {id:'protector-colchon',sem:20,cat:'Habitación',nombre:'Protector de colchón impermeable',precio:'10-25 €',ejemplos:[{t:'minicuna',q:'protector colchon minicuna impermeable'},{t:'cuna 60×120',q:'protector colchon cuna 60x120 impermeable'}]},
+ {id:'organizador-cambiador',sem:20,cat:'Habitación',nombre:'Cestas del cambiador (pañales y cremas)',precio:'15-30 €',ejemplos:[{t:'cestas',q:'cesta organizador panales cambiador'}]},
+ {id:'carrito',sem:24,cat:'Paseo y coche',nombre:'Carrito de paseo (dúo o trío)',precio:'350-900 €',ejemplos:[{t:'Bugaboo Fox',q:'bugaboo fox 5'},{t:'Cybex Priam',q:'cybex priam'},{t:'Kinderkraft (económico)',q:'kinderkraft carrito 3 en 1'}]},
+ {id:'silla-coche',sem:24,cat:'Paseo y coche',nombre:'Silla de coche grupo 0 (i-Size)',precio:'150-350 €',ejemplos:[{t:'Cybex Aton B2',q:'cybex aton b2 i-size'},{t:'Maxi-Cosi CabrioFix',q:'maxi-cosi cabriofix i-size'}]},
+ {id:'vigilabebes',sem:24,cat:'Habitación',nombre:'Vigilabebés',precio:'40-180 €',ejemplos:[{t:'Philips Avent',q:'philips avent vigilabebes'},{t:'con cámara',q:'vigilabebes camara'}]},
+ {id:'espejo-retrovisor',sem:24,cat:'Paseo y coche',nombre:'Espejo retrovisor para ver al bebé',precio:'10-20 €',ejemplos:[{t:'espejo 360°',q:'espejo retrovisor bebe coche'}]},
+ {id:'accesorios-carro',sem:24,cat:'Paseo y coche',nombre:'Accesorios del carro (bolso, ganchos, mosquitera)',precio:'25-60 €',ejemplos:[{t:'bolso organizador',q:'bolso carrito bebe organizador'},{t:'ganchos',q:'ganchos carrito bebe'},{t:'mosquitera',q:'mosquitera carrito bebe universal'}]},
+ {id:'cambiador-paseo',sem:24,cat:'Paseo y coche',nombre:'Cambiador de paseo y pañalera',precio:'15-35 €',ejemplos:[{t:'cambiador plegable',q:'cambiador bebe portatil plegable'},{t:'pañalera',q:'panalera neceser bebe'}]},
+ {id:'banera',sem:28,cat:'Baño e higiene',nombre:'Bañera de bebé',precio:'25-60 €',ejemplos:[{t:'Stokke Flexi Bath',q:'stokke flexi bath'},{t:'OK Baby Onda',q:'ok baby onda banera'},{t:'esponja natural',q:'esponja natural bebe recien nacido'}]},
+ {id:'bodies',sem:28,cat:'Ropa',nombre:'Bodies 0-3 meses (6-8 uds.)',precio:'25-40 €',ejemplos:[{t:'pack de algodón',q:'bodies bebe 0-3 meses algodon'}]},
+ {id:'pijamas',sem:28,cat:'Ropa',nombre:'Pijamas 0-3 meses (4-6 uds.)',precio:'25-45 €',ejemplos:[{t:'de algodón',q:'pijama bebe 0-3 meses algodon'}]},
+ {id:'sacaleches',sem:28,cat:'Mamá',nombre:'Sacaleches (si hay lactancia materna)',precio:'30-180 €',ejemplos:[{t:'Medela Swing Flex',q:'medela swing flex'},{t:'manual Philips Avent',q:'philips avent sacaleches manual'}]},
+ {id:'biberones',sem:28,cat:'Alimentación',nombre:'Biberones y tetinas talla 0',precio:'15-35 €',ejemplos:[{t:'Philips Avent Natural',q:'philips avent natural biberon recien nacido'},{t:'Suavinex',q:'suavinex biberon recien nacido'}]},
+ {id:'toallas-capucha',sem:28,cat:'Baño e higiene',nombre:'Toallas con capucha (2-3 uds.)',precio:'15-30 €',ejemplos:[{t:'de algodón',q:'toalla capucha bebe algodon'}]},
+ {id:'hamaca',sem:28,cat:'Juego y descanso',nombre:'Hamaca',precio:'60-200 €',ejemplos:[{t:'BabyBjörn Bliss',q:'hamaca bebe babybjorn'},{t:'económica',q:'hamaca bebe reclinable'}]},
+ {id:'esterilizador',sem:28,cat:'Alimentación',nombre:'Esterilizador de biberones (si hay biberón)',precio:'30-70 €',ejemplos:[{t:'eléctrico',q:'esterilizador biberones'},{t:'para microondas',q:'esterilizador biberones microondas'}]},
+ {id:'baberos',sem:28,cat:'Ropa',nombre:'Baberos pequeños (6-8 uds.)',precio:'10-20 €',ejemplos:[{t:'de algodón',q:'baberos bebe recien nacido algodon'},{t:'de rizo',q:'baberos rizo bebe pack'}]},
+ {id:'luz-nocturna',sem:28,cat:'Habitación',nombre:'Luz nocturna para las tomas',precio:'15-30 €',ejemplos:[{t:'regulable',q:'luz nocturna bebe regulable'}]},
+ {id:'accesorios-biberon',sem:28,cat:'Alimentación',nombre:'Accesorios del biberón (escurridor, dosificador, termo)',precio:'25-50 €',ejemplos:[{t:'escurrebiberones',q:'escurridor biberones plegable'},{t:'dosificador de leche',q:'dosificador leche polvo bebe'},{t:'termo',q:'termo biberon bebe'}]},
+ {id:'bolsa-hospital',sem:32,cat:'Mamá',nombre:'Bolsa del hospital',precio:'30-70 €',ejemplos:[{t:'bolsa de maternidad',q:'bolsa maternidad hospital'}]},
+ {id:'muselinas',sem:32,cat:'Ropa',nombre:'Gasas y muselinas (8-10 uds.)',precio:'15-30 €',ejemplos:[{t:'Aden + Anais',q:'aden anais muselina'},{t:'pack de gasas',q:'muselinas bebe algodon pack'}]},
+ {id:'portabebes',sem:32,cat:'Paseo y coche',nombre:'Fular o mochila de porteo',precio:'30-180 €',ejemplos:[{t:'Ergobaby Omni',q:'ergobaby omni breeze'},{t:'fular elástico',q:'fular portabebes elastico'}]},
+ {id:'termometro',sem:32,cat:'Farmacia',nombre:'Termómetro',precio:'10-45 €',ejemplos:[{t:'Braun ThermoScan',q:'braun thermoscan 7'}]},
+ {id:'aspirador-nasal',sem:32,cat:'Farmacia',nombre:'Aspirador nasal',precio:'8-20 €',ejemplos:[{t:'NoseFrida',q:'nosefrida aspirador nasal'}]},
+ {id:'kit-lactancia',sem:32,cat:'Mamá',nombre:'Kit de lactancia (discos, pezoneras, lanolina)',precio:'20-40 €',ejemplos:[{t:'lanolina',q:'lanolina pezones lactancia'},{t:'discos de lactancia',q:'discos lactancia desechables'},{t:'bolsas de leche',q:'bolsas conservacion leche materna'}]},
+ {id:'posparto-mama',sem:32,cat:'Mamá',nombre:'Kit posparto para la madre',precio:'20-40 €',ejemplos:[{t:'kit posparto',q:'compresas postparto braguitas desechables'},{t:'empapadores',q:'empapadores desechables cama'}]},
+ {id:'detergente-bebe',sem:32,cat:'Ropa',nombre:'Detergente de bebé y quitamanchas',precio:'10-20 €',ejemplos:[{t:'Norit Bebé',q:'norit bebe detergente'},{t:'quitamanchas',q:'quitamanchas ropa bebe'}]},
+ {id:'ropa-lactancia-mama',sem:32,cat:'Mamá',nombre:'Camisón de lactancia y bata',precio:'30-60 €',ejemplos:[{t:'camisón de lactancia',q:'camison lactancia premama'},{t:'bata',q:'bata premama hospital'}]},
+ {id:'cubre-lactancia',sem:32,cat:'Mamá',nombre:'Cubre para dar el pecho fuera de casa',precio:'15-30 €',ejemplos:[{t:'pañuelo de lactancia',q:'cubre lactancia pañuelo'}]},
+ {id:'panales',sem:36,cat:'Baño e higiene',nombre:'Pañales talla 1 (1-2 paquetes)',precio:'10-20 €',ejemplos:[{t:'Dodot Sensitive',q:'dodot sensitive talla 1'},{t:'Pingo (eco)',q:'pingo panales talla 1'}]},
+ {id:'crema-panal',sem:36,cat:'Baño e higiene',nombre:'Crema del pañal',precio:'6-12 €',ejemplos:[{t:'Mustela 123',q:'mustela bebe crema balsamo 123'},{t:'Weleda caléndula',q:'weleda calendula crema panal'}]},
+ {id:'toallitas',sem:36,cat:'Baño e higiene',nombre:'Toallitas o algodón y agua',precio:'8-15 €',ejemplos:[{t:'WaterWipes',q:'waterwipes toallitas'}]},
+ {id:'arrullo',sem:36,cat:'Ropa',nombre:'Arrullo y saquito de dormir',precio:'20-45 €',ejemplos:[{t:'arrullo envolvente',q:'arrullo bebe recien nacido'},{t:'saco 0-6 meses',q:'saco dormir bebe 0-6 meses'}]},
+ {id:'botiquin',sem:36,cat:'Farmacia',nombre:'Botiquín básico (suero, tijeritas, cepillo)',precio:'10-20 €',ejemplos:[{t:'suero monodosis',q:'suero fisiologico monodosis bebe'},{t:'set de cuidado',q:'set cuidado bebe recien nacido'}]},
+ {id:'kit-farmacia',sem:36,cat:'Farmacia',nombre:'Kit de farmacia del ombligo',precio:'15-25 €',ejemplos:[{t:'clorhexidina',q:'clorhexidina cordon umbilical bebe'},{t:'gasas estériles',q:'gasas esteriles 10x10 bebe'}]},
+ {id:'chupetes',sem:40,cat:'Alimentación',nombre:'Chupetes talla 0 (por si acaso)',precio:'6-12 €',ejemplos:[{t:'Suavinex Zero',q:'suavinex chupete zero'}]},
+ {id:'primera-puesta',sem:40,cat:'Ropa',nombre:'Conjunto de la primera puesta',precio:'15-30 €',ejemplos:[{t:'primera puesta',q:'primera puesta bebe hospital'}]},
+ {id:'cuna',sem:40,cat:'Habitación',nombre:'Cuna 60×120 y colchón (hacia los 4-6 meses)',precio:'120-300 €',ejemplos:[{t:'cuna de madera',q:'cuna bebe 60x120 madera'},{t:'colchón 60×120',q:'colchon cuna 60x120'},{t:'sábanas 60×120',q:'sabanas cuna 60x120 algodon'}]},
+ {id:'trona',sem:40,cat:'Alimentación',nombre:'Trona (hacia los 6 meses)',precio:'80-300 €',ejemplos:[{t:'Stokke Tripp Trapp',q:'stokke tripp trapp trona'},{t:'económica',q:'trona bebe evolutiva'}]},
+ {id:'cuna-viaje',sem:40,cat:'Habitación',nombre:'Cuna de viaje, que hace de parque (más adelante)',precio:'60-150 €',ejemplos:[{t:'cuna de viaje',q:'cuna viaje parque bebe'}]},
+ {id:'saco-silla',sem:40,cat:'Paseo y coche',nombre:'Saco para la silla de paseo (invierno)',precio:'40-90 €',ejemplos:[{t:'saco universal',q:'saco silla paseo bebe invierno universal'}]},
+ {id:'portachupetes',sem:40,cat:'Alimentación',nombre:'Broche portachupetes',precio:'6-15 €',ejemplos:[{t:'broche',q:'broche portachupetes bebe'}]},
+ {id:'juguetes-primeros',sem:40,cat:'Juego y descanso',nombre:'Primeros juguetes: sonajero y doudou',precio:'15-35 €',ejemplos:[{t:'sonajero',q:'sonajero bebe recien nacido'},{t:'doudou',q:'doudou bebe peluche apego'}]}
 ];
 const SEMLIST=[16,20,24,28,32,36,40];
+const CATS=['Habitación', 'Paseo y coche', 'Ropa', 'Baño e higiene', 'Alimentación', 'Farmacia', 'Mamá', 'Juego y descanso'];
+const catDe=it=>CATS.includes(it.cat)?it.cat:'Otros';
+const ordenCat=(a,b)=>(CATS.indexOf(catDe(a))+1||99)-(CATS.indexOf(catDe(b))+1||99);
+const LLAVE_LV='gestor-baja/listaVista';
+let LISTAVISTA='sem';   // 'sem' | 'cat' — solo presentación, se recuerda en este dispositivo
+try{ if(localStorage.getItem(LLAVE_LV)==='cat') LISTAVISTA='cat'; }catch(e){}
 
 /* ===== catálogo remoto =====
    Los artículos y enlaces de la lista se amplían sin publicar versión: la app baja la
@@ -3426,7 +3442,7 @@ function catalogoAplica(filas){
   const porId=new Map(CATALOGO.map(it=>[it.id,it]));
   filas.forEach(f=>{
     if(!f||!f.id||!f.nombre||!f.sem) return;
-    const it={id:String(f.id),sem:+f.sem,nombre:String(f.nombre),precio:f.precio||'',
+    const it={id:String(f.id),sem:+f.sem,nombre:String(f.nombre),precio:f.precio||'',cat:f.cat||'',
               ejemplos:Array.isArray(f.ejemplos)?f.ejemplos:[]};
     if(f.nuevo_hasta&&Date.parse(f.nuevo_hasta)>Date.now()) it.nuevo=true;
     if(f.activo===false) porId.delete(it.id); else porId.set(it.id,it);
@@ -3442,7 +3458,7 @@ async function catalogoBaja(){
   if(!SES||CAT_BAJANDO) return;
   CAT_BAJANDO=true;
   try{
-    const filas=await pg('GET','catalogo?select=id,sem,nombre,precio,ejemplos,activo,nuevo_hasta&order=sem');
+    const filas=await pg('GET','catalogo?select=id,sem,nombre,precio,ejemplos,cat,activo,nuevo_hasta&order=sem');
     const antes=new Set(CATV.map(it=>it.id));
     catalogoAplica(filas);
     await almacenEscribe(JSON.stringify(filas||[]), LLAVE_CAT);
@@ -3463,7 +3479,7 @@ function semanaGest(){
 // catálogo + añadidos a mano, con la misma forma
 function itemsLista(){
   return CATV.concat(S.lista.propios.map(p=>({
-    id:p.id,sem:p.sem,nombre:p.nombre,precio:p.precio,
+    id:p.id,sem:p.sem,nombre:p.nombre,precio:p.precio,cat:p.cat,
     ejemplos:p.url?[{t:'ver enlace',url:p.url}]:[],propio:true})));
 }
 function pintaLista(){
@@ -3472,26 +3488,46 @@ function pintaLista(){
   const vivos=items.filter(it=>est(it.id)!=='x');
   const hechos=vivos.filter(it=>est(it.id)==='c').length;
   $('lstCnt').textContent=hechos+' de '+vivos.length+' comprados';
-  const grupos=new Map();
-  vivos.forEach(it=>{ if(!grupos.has(it.sem)) grupos.set(it.sem,[]); grupos.get(it.sem).push(it); });
-  const sems=[...grupos.keys()].sort((a,b)=>a-b);
+  $('lstModo').querySelectorAll('button').forEach(bt=>bt.setAttribute('aria-pressed',String(bt.dataset.modo===LISTAVISTA)));
   const sg=semanaGest();
-  const ahora=sg==null?null:(sems.find(s=>s>=sg)!==undefined?sems.find(s=>s>=sg):sems[sems.length-1]);
-  $('lstGrupos').innerHTML=sems.map(sem=>
-    '<div class="lst-sem">Semana '+sem+(sem===ahora?'<span class="ahora">· toca ahora</span>':'')+'</div>'+
-    grupos.get(sem).map(it=>{
-      const c=est(it.id)==='c';
-      const ejs=(it.ejemplos||[]).map(e=>'<a href="'+esc(enlaceEj(e))+'" target="_blank" rel="sponsored noopener">'+esc(e.t)+'</a>').join(' · ');
-      return '<div class="art'+(c?' hecho':'')+'">'+
-        '<button type="button" class="art-chk" data-chk="'+esc(it.id)+'" aria-pressed="'+c+'" aria-label="'+
-          esc((c?'Desmarcar: ':'Marcar como comprado: ')+it.nombre)+'">✓</button>'+
-        '<div class="art-tx"><b>'+esc(it.nombre)+'</b>'+(it.nuevo?'<span class="tag-nuevo">nuevo</span>':'')+'<small>'+esc(it.precio||'')+
-          (ejs?(it.precio?' · ':'')+ejs:'')+'</small></div>'+
-        '<button type="button" class="art-x" data-x="'+esc(it.id)+'" aria-label="'+
-          esc((it.propio?'Quitar de la lista: ':'No lo necesitamos: ')+it.nombre)+'">✕</button>'+
-        '</div>';
-    }).join('')
-  ).join('');
+  const arte=(it,conSem)=>{
+    const c=est(it.id)==='c';
+    const ejs=(it.ejemplos||[]).map(e=>'<a href="'+esc(enlaceEj(e))+'" target="_blank" rel="sponsored noopener">'+esc(e.t)+'</a>').join(' · ');
+    const meta=[conSem?'<span class="art-sem">semana '+it.sem+'</span>':'',esc(it.precio||''),ejs].filter(Boolean).join(' · ');
+    return '<div class="art'+(c?' hecho':'')+'">'+
+      '<button type="button" class="art-chk" data-chk="'+esc(it.id)+'" aria-pressed="'+c+'" aria-label="'+
+        esc((c?'Desmarcar: ':'Marcar como comprado: ')+it.nombre)+'">✓</button>'+
+      '<div class="art-tx"><b>'+esc(it.nombre)+'</b>'+(it.nuevo?'<span class="tag-nuevo">nuevo</span>':'')+'<small>'+meta+'</small></div>'+
+      '<button type="button" class="art-x" data-x="'+esc(it.id)+'" aria-label="'+
+        esc((it.propio?'Quitar de la lista: ':'No lo necesitamos: ')+it.nombre)+'">✕</button>'+
+      '</div>';
+  };
+  let html='';
+  if(LISTAVISTA==='cat'){
+    // por temática: cada bloque ordenado por semana, con la semana al lado de cada artículo
+    const grupos=new Map();
+    vivos.forEach(it=>{ const c=catDe(it); if(!grupos.has(c)) grupos.set(c,[]); grupos.get(c).push(it); });
+    const cats=CATS.concat('Otros').filter(c=>grupos.has(c));
+    html=cats.map(c=>'<div class="lst-sem">'+esc(c)+'</div>'+
+      grupos.get(c).sort((x,y)=>x.sem-y.sem).map(it=>arte(it,true)).join('')).join('');
+  }else{
+    // por semana (la vista de siempre, con «toca ahora»); dentro de cada semana, por temática
+    const grupos=new Map();
+    vivos.forEach(it=>{ if(!grupos.has(it.sem)) grupos.set(it.sem,[]); grupos.get(it.sem).push(it); });
+    const sems=[...grupos.keys()].sort((a,b)=>a-b);
+    const ahora=sg==null?null:(sems.find(s=>s>=sg)!==undefined?sems.find(s=>s>=sg):sems[sems.length-1]);
+    html=sems.map(sem=>{
+      const arts=grupos.get(sem).slice().sort(ordenCat);
+      let cat=null, h='<div class="lst-sem">Semana '+sem+(sem===ahora?'<span class="ahora">· toca ahora</span>':'')+'</div>';
+      arts.forEach(it=>{
+        const c=catDe(it);
+        if(c!==cat){ cat=c; if(arts.length>3) h+='<div class="lst-cat">'+esc(c)+'</div>'; }
+        h+=arte(it,false);
+      });
+      return h;
+    }).join('');
+  }
+  $('lstGrupos').innerHTML=html;
   const desc=items.filter(it=>est(it.id)==='x');
   $('lstDescN').textContent=desc.length;
   $('lstDescartados').hidden=!desc.length;
@@ -3964,6 +4000,12 @@ async function init(){
 
   // la lista del bebé: conmutador en la cabecera, marcado de artículos, altas propias y envío
   SEMLIST.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent='Semana '+s;$('itSem').appendChild(o);});
+  CATS.concat('Otros').forEach(c=>{const o=document.createElement('option');o.value=c==='Otros'?'':c;o.textContent=c;$('itCat').appendChild(o);});
+  $('lstModo').addEventListener('click',e=>{
+    const b=e.target.closest('button[data-modo]'); if(!b) return;
+    LISTAVISTA=b.dataset.modo; try{ localStorage.setItem(LLAVE_LV,LISTAVISTA); }catch(e2){}
+    pintaLista();
+  });
   // el enlace a las guías de allonest.es solo existe en la web: en las apps de las
   // tiendas queda oculto (y así ningún revisor ve enlaces salientes en la cabecera)
   if(!nativo) $('verGuiasWeb').hidden=false;
@@ -4024,7 +4066,7 @@ async function init(){
     if(!nombre){ err.textContent='Dinos qué es.'; err.hidden=false; $('itNombre').focus(); return; }
     if(url&&!/^https?:\/\//i.test(url)){ err.textContent='El enlace tiene que empezar por http:// o https://'; err.hidden=false; $('itUrl').focus(); return; }
     err.hidden=true;
-    S.lista.propios.push({id:'u'+Date.now().toString(36),nombre:nombre,sem:+$('itSem').value||40,
+    S.lista.propios.push({id:'u'+Date.now().toString(36),nombre:nombre,sem:+$('itSem').value||40,cat:$('itCat').value,
                           precio:$('itPrecio').value.trim().slice(0,20),url:url.slice(0,300)});
     guardar(); cierraHoja(); pintaLista();
     hint('Añadido a la lista.');
