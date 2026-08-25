@@ -794,10 +794,14 @@ html,body{overscroll-behavior-y:contain}
     <small>elige qué artículos van y en qué formato</small></span>
     <button type="button" class="hoja-x" data-cerrar aria-label="Cerrar">✕</button></div>
   <div class="hoja-cuerpo">
+    <div class="aj-fila" style="margin-bottom:8px">
+      <button type="button" class="cta" id="btEnvTexto2" style="flex:1 1 46%;padding:10px 12px;font-size:14px">Enviar el texto</button>
+      <button type="button" class="cta" id="btEnvPagina2" style="flex:1 1 46%;padding:10px 12px;font-size:14px;background:var(--azulF)">Enviar página bonita</button>
+    </div>
+    <p class="aj-nota" style="margin:0 0 8px">El texto lleva los enlaces: en WhatsApp solo queda elegir a quién. La página bonita es un archivo que se abre en cualquier navegador, para enseñar la lista sin dar acceso a la app.</p>
     <div class="aj-fila" style="margin-bottom:2px">
       <button type="button" class="mini" id="btSelTodo">Todos</button>
       <button type="button" class="mini" id="btSelNada">Ninguno</button>
-      <button type="button" class="cta" id="btEnvTexto2" style="margin-left:auto;padding:9px 16px;font-size:14px">Enviar el texto</button>
     </div>
     <div id="envLista"></div>
     <p class="aj-nota">El texto va con los enlaces incluidos: en WhatsApp solo queda elegir a quién. La página de solo lectura es un archivo que se abre en cualquier navegador, para dejar ver la lista sin dar acceso a la app.</p>
@@ -3633,7 +3637,7 @@ function actualizaEnviar(){
   $('btEnvTexto').textContent=t;
   $('btEnvTexto2').textContent=t;   // el duplicado de arriba, para quien no llega abajo
   $('btEnvPagina').textContent='Enviar como página de solo lectura';
-  $('btEnvTexto').disabled=!n; $('btEnvTexto2').disabled=!n; $('btEnvPagina').disabled=!n;
+  $('btEnvTexto').disabled=!n; $('btEnvTexto2').disabled=!n; $('btEnvPagina').disabled=!n; $('btEnvPagina2').disabled=!n;
 }
 function textoLista(sel){
   const grupos=gruposSel(sel);
@@ -4109,6 +4113,7 @@ async function init(){
   $('btEnvTexto').addEventListener('click',enviarTexto);
   $('btEnvTexto2').addEventListener('click',enviarTexto);
   $('btEnvPagina').addEventListener('click',enviarPagina);
+  $('btEnvPagina2').addEventListener('click',enviarPagina);   // el de arriba: el de abajo casi nadie lo veía
   $('btNuevoItem').addEventListener('click',()=>{
     $('itNombre').value=''; $('itPrecio').value=''; $('itUrl').value=''; $('itErr').hidden=true;
     const sg=semanaGest();
