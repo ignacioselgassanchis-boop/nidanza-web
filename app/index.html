@@ -510,7 +510,16 @@ html,body{overscroll-behavior-y:contain}
     </div>
 
     <div id="listaVista" hidden>
-      <section class="tarjeta">
+      <div class="seg seg-lista" id="lstSeccion" role="tablist" aria-label="Lista del bebé o trámites" style="margin:0 0 10px">
+        <button type="button" role="tab" data-seccion="lista" aria-pressed="true">La lista del bebé</button>
+        <button type="button" role="tab" data-seccion="tramites" aria-pressed="false">Trámites</button>
+      </div>
+      <section class="tarjeta" id="trSeccion" hidden>
+        <div class="lst-cab"><h2>Los trámites</h2><span class="cnt" id="trCnt"></span></div>
+        <p class="aj-nota" style="margin:0 0 6px">El papeleo del primer año, con la fecha que toca según tu fecha de parto y tu calendario. Orientativo: los plazos exactos los fija tu empresa, tu convenio y tu comunidad.</p>
+        <div id="trGrupos"></div>
+      </section>
+      <section class="tarjeta" id="lstSeccionCuerpo">
         <div class="lst-cab"><h2 id="lstTitulo">La lista del bebé</h2><span class="cnt" id="lstCnt"></span></div>
         <p class="aj-nota" style="margin:0 0 10px">Lo que hace falta, semana a semana. Los enlaces de ejemplo llevan afiliado: no te cuestan más y ayudan a mantener la app.</p>
         <div class="lst-acciones">
@@ -1288,7 +1297,9 @@ const S={
   perfil:{apodo:'', progenitores:['',''], comunidad:'', docente:'no', docenteQuien:0, onboardingHecho:false},
   // estado de la lista del bebé: por id, 'c' comprado o 'x' descartado (pendiente = ausencia);
   // propios = artículos añadidos a mano desde la app
-  lista:{estado:{}, propios:[]}
+  lista:{estado:{}, propios:[]},
+  // trámites hechos, por id ('c'); ausencia = pendiente
+  tramites:{}
 };
 const bi=()=>S.familia==='bi';
 // primer día en que el peque ya tiene 9 meses: la lactancia acumulada tiene que quedar antes
@@ -1873,7 +1884,8 @@ function instantanea(){
           perfil:{apodo:S.perfil.apodo,progenitores:S.perfil.progenitores.slice(0,2),
                   comunidad:S.perfil.comunidad,docente:S.perfil.docente,
                   docenteQuien:S.perfil.docenteQuien,onboardingHecho:S.perfil.onboardingHecho},
-          lista:{estado:S.lista.estado,propios:S.lista.propios}};
+          lista:{estado:S.lista.estado,propios:S.lista.propios},
+          tramites:S.tramites};
 }
 // Ruta de migración. v1 no llevaba número de esquema y es idéntica a v2 salvo por eso.
 function migra(d){
@@ -1985,6 +1997,9 @@ function aplica(d){
     while(S.perfil.progenitores.length<2) S.perfil.progenitores.push('');
   }
   // la lista del bebé viaja igual que perfil: un guardado sin ella conserva la actual
+  S.tramites={};
+  if(d.tramites&&typeof d.tramites==='object')
+    Object.keys(d.tramites).forEach(k=>{ if(d.tramites[k]==='c') S.tramites[String(k).slice(0,32)]='c'; });
   if(d.lista&&typeof d.lista==='object'){
     const est={};
     if(d.lista.estado&&typeof d.lista.estado==='object')
@@ -2561,6 +2576,11 @@ function fusiona(base, rem, loc){
     if(J(pL[id])!==J(pB[id])){ if(!pL[id]) delete props[id]; else props[id]=pL[id]; }
   });
   out.lista={estado:est,propios:Object.keys(props).map(k=>props[k])};
+  const tB=base.tramites||{}, tL=loc.tramites||{}, tr=Object.assign({},rem.tramites||{});
+  new Set(Object.keys(tL).concat(Object.keys(tB))).forEach(id=>{
+    if(tL[id]!==tB[id]){ if(tL[id]===undefined) delete tr[id]; else tr[id]=tL[id]; }
+  });
+  out.tramites=tr;
   out.esquema=ESQUEMA;
   return out;
 }
@@ -3537,6 +3557,94 @@ const CATS=['Habitación', 'Paseo y coche', 'Ropa', 'Baño e higiene', 'Alimenta
 const catDe=it=>CATS.includes(it.cat)?it.cat:'Otros';
 const ordenCat=(a,b)=>(CATS.indexOf(catDe(a))+1||99)-(CATS.indexOf(catDe(b))+1||99);
 const LLAVE_LV='gestor-baja/listaVista';
+
+/* ===== trámites =====
+   El papeleo del primer año, por fases, con la fecha que toca calculada desde la fecha de
+   parto (y desde la vuelta al trabajo de cada uno, que el calendario ya sabe). El estado
+   (hecho) va en S.tramites por id, se guarda y se fusiona igual que la lista del bebé.
+   Reglas: los ids no se renombran (son la clave del estado). */
+const TRAMITES=[
+ {f:'Durante el embarazo',id:'convenio',t:'Leer el convenio colectivo',
+  d:'Busca permisos por nacimiento, lactancia acumulada y mejoras sobre la ley: ahí es donde se ganan días. Si no lo encuentras, pídelo a RRHH o al comité.',
+  c:(n)=>'cuanto antes'},
+ {f:'Durante el embarazo',id:'avisar-empresa',t:'Contarlo en la empresa',
+  d:'No hay obligación ni plazo; se suele hacer entre la semana 12 y la 20. Desde entonces puedes ausentarte para exámenes prenatales y preparación al parto (art. 37.3 f ET). Por escrito, y con copia.',
+  c:(n)=>'entre las semanas 12 y 20'},
+ {f:'Durante el embarazo',id:'riesgo-embarazo',t:'Si tu puesto tiene riesgo para el embarazo, pedir la prestación por riesgo',
+  d:'La valora la mutua con el informe del servicio de prevención; si no hay puesto compatible, se cobra el 100 % hasta el parto. Solo aplica a la madre.',
+  c:(n)=>'si aplica'},
+
+ {f:'Antes del parto',id:'reparto',t:'Decidir el reparto y comunicárselo a la empresa',
+  d:'Cada progenitor avisa a la suya, por escrito, de cómo disfrutará el permiso: las 6 obligatorias y, si ya lo sabéis, las semanas flexibles. Mínimo 15 días de antelación.',
+  c:(n)=>'antes del '+fmt(addDays(n,-15))},
+ {f:'Antes del parto',id:'adelantar',t:'Si la madre quiere adelantar el permiso',
+  d:'La madre biológica puede empezar hasta 4 semanas antes de la fecha prevista. Se comunica a la empresa igual que el resto.',
+  c:(n)=>'desde el '+fmt(addDays(n,-28))+', si se quiere'},
+ {f:'Antes del parto',id:'clave',t:'Tener Cl@ve o certificado digital',
+  d:'Con cualquiera de los dos la prestación se pide desde casa en la sede electrónica de la Seguridad Social. Cl@ve se activa en un registro presencial o por videollamada; los dos progenitores.',
+  c:(n)=>'antes del parto'},
+
+ {f:'Al nacer',id:'registro-civil',t:'Inscribir al bebé en el Registro Civil',
+  d:'Desde el propio hospital en las primeras 72 horas (el formulario lo da el centro), o en el Registro Civil en los 8 días siguientes; con justificación, hasta 30. Con la inscripción se obtiene el certificado de nacimiento (el libro de familia en papel dejó de expedirse en 2021).',
+  c:(n)=>'hasta el '+fmt(addDays(n,8))},
+ {f:'Al nacer',id:'alta-ss',t:'Dar de alta al bebé en la Seguridad Social',
+  d:'Como beneficiario del padre o de la madre, en «Tu Seguridad Social» o en el INSS con cita. Es lo que da la tarjeta sanitaria del bebé.',
+  c:(n)=>'la primera semana'},
+ {f:'Al nacer',id:'pediatra',t:'Empadronar al bebé y pedir pediatra',
+  d:'Empadronamiento en el ayuntamiento (con el certificado de nacimiento) y asignación de pediatra en el centro de salud; la primera revisión suele ser a los pocos días del alta.',
+  c:(n)=>'la primera semana'},
+ {f:'Al nacer',id:'certificado-empresa',t:'Comprobar que la empresa envía el certificado de empresa',
+  d:'Lo manda cada empresa al INSS por Certific@2 en cuanto le comunicas el nacimiento; sin él la prestación se queda parada. Un mensaje a RRHH basta.',
+  c:(n)=>'la primera semana'},
+
+ {f:'La prestación',id:'solicitar-inss',t:'Solicitar la prestación por nacimiento, cada progenitor la suya',
+  d:'En la sede electrónica de la Seguridad Social (con Cl@ve o certificado), en «Tu Seguridad Social» o presencial con cita en el INSS. Hace falta DNI, certificado de nacimiento e IBAN; el certificado de empresa ya lo tienen. Se puede pedir después, pero no cobras hasta que la resuelven.',
+  c:(n)=>'las primeras semanas'},
+ {f:'La prestación',id:'resolucion',t:'Guardar la resolución y comprobar el primer ingreso',
+  d:'La paga el INSS directamente, el 100 % de la base reguladora, exenta de IRPF. Si tarda más de 30 días o el importe no cuadra, reclamar por la sede electrónica.',
+  c:(n)=>'al mes de pedirla'},
+
+ {f:'El primer año',id:'flexibles',t:'Avisar de cada tramo de semanas flexibles',
+  d:'Cada vez que vayas a coger semanas flexibles, comunicación escrita a la empresa con 15 días de antelación. El PDF de Allonest sirve de anexo.',
+  c:(n)=>'15 días antes de cada tramo'},
+ {f:'El primer año',id:'lactancia',t:'Pedir la lactancia acumulada por escrito',
+  d:'Indicando la fórmula (acumulada en días) y las fechas, con 15 días de antelación. Allonest calcula los días desde tu calendario; si el convenio fija otra cifra, manda el convenio.',
+  c:(n,R)=>{const v=R&&(R.vueltaA||R.vueltaB); return v?'antes del '+fmt(addDays(v,-15)):'15 días antes de volver';}},
+ {f:'El primer año',id:'deduccion',t:'Deducción por maternidad: 100 € al mes',
+  d:'Para madres trabajadoras con hijos menores de 3 años. Se cobra por adelantado pidiéndola con el modelo 140 (por internet, en minutos) o se descuenta en la renta. Tiene un extra por gastos de escuela infantil.',
+  c:(n)=>'desde el nacimiento'},
+ {f:'El primer año',id:'ayudas',t:'Mirar las ayudas y deducciones de tu comunidad',
+  d:'Casi todas tienen algo por nacimiento (deducción autonómica en la renta, ayuda directa, bono para la escuela infantil). Los plazos son cortos y se pasan.',
+  c:(n)=>'los primeros meses'},
+ {f:'El primer año',id:'escuela',t:'Preinscripción en la escuela infantil',
+  d:'Las escuelas públicas abren plazo en primavera (abril-mayo) para septiembre; las privadas, cuando quieren. Si el bebé nace en otoño, la plaza de septiembre se pide con meses de antelación.',
+  c:(n)=>'en primavera'},
+
+ {f:'La vuelta',id:'reincorporacion',t:'Confirmar la reincorporación con RRHH',
+  d:'Fecha, horario y si hay algo que hablar (teletrabajo, turnos). Volver es un derecho en las mismas condiciones.',
+  c:(n,R)=>{const v=R&&R.vueltaA; return v?'antes del '+fmt(v):'antes de volver';}},
+ {f:'La vuelta',id:'reduccion',t:'Si quieres reducción de jornada por cuidado del hijo',
+  d:'Entre un octavo y la mitad de la jornada, hasta que el niño cumple 12 años, con reducción proporcional del sueldo. Se pide por escrito con 15 días de antelación; la empresa no puede negarla, solo discutir el horario.',
+  c:(n)=>'si se quiere'},
+ {f:'La vuelta',id:'parental8',t:'Recordar el permiso parental de 8 semanas',
+  d:'Sin sueldo, hasta los 8 años del niño, por progenitor. No se resta de las 19: es una reserva para un verano, una adaptación a la escuela o una mudanza.',
+  c:(n)=>'hasta los 8 años'}
+];
+const FASES_TR=['Durante el embarazo','Antes del parto','Al nacer','La prestación','El primer año','La vuelta'];
+function pintaTramites(){
+  const hechos=Object.keys(S.tramites).filter(id=>S.tramites[id]==='c'&&TRAMITES.some(t=>t.id===id)).length;
+  $('trCnt').textContent=hechos+' de '+TRAMITES.length+' hechos';
+  const nac=CONFIG?parseISO(S.nac):null, R=CONFIG?calcular():null;
+  $('trGrupos').innerHTML=FASES_TR.map(f=>'<div class="lst-sem">'+esc(f)+'</div>'+
+    TRAMITES.filter(t=>t.f===f).map(t=>{
+      const c=S.tramites[t.id]==='c';
+      let cuando=''; try{ cuando=nac?t.c(nac,R):''; }catch(e){}
+      return '<div class="art'+(c?' hecho':'')+'">'+
+        '<button type="button" class="art-chk" data-tchk="'+esc(t.id)+'" aria-pressed="'+c+'" aria-label="'+esc((c?'Desmarcar: ':'Marcar como hecho: ')+t.t)+'">✓</button>'+
+        '<div class="art-tx"><b>'+esc(t.t)+'</b>'+(cuando?'<span class="art-sem" style="display:block;margin:2px 0 3px">'+esc(cuando)+'</span>':'')+
+        '<small>'+esc(t.d)+'</small></div></div>';
+    }).join('')).join('');
+}
 let LISTAVISTA='sem';   // 'sem' | 'cat' — solo presentación, se recuerda en este dispositivo
 try{ if(localStorage.getItem(LLAVE_LV)==='cat') LISTAVISTA='cat'; }catch(e){}
 
@@ -3593,7 +3701,11 @@ function itemsLista(){
     id:p.id,sem:p.sem,nombre:p.nombre,precio:p.precio,cat:p.cat,
     ejemplos:p.url?[{t:'ver enlace',url:p.url}]:[],propio:true})));
 }
+let SECCION='lista';   // 'lista' | 'tramites'
 function pintaLista(){
+  $('lstSeccion').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.seccion===SECCION)));
+  $('trSeccion').hidden=SECCION!=='tramites'; $('lstSeccionCuerpo').hidden=SECCION==='tramites';
+  if(SECCION==='tramites'){ pintaTramites(); return; }
   $('lstTitulo').textContent=S.perfil.apodo?'La lista de '+S.perfil.apodo:'La lista del bebé';
   const items=itemsLista(), est=id=>S.lista.estado[id]||'p';
   const vivos=items.filter(it=>est(it.id)!=='x');
@@ -4136,6 +4248,16 @@ async function init(){
     $('abreLista').setAttribute('aria-label',enLista?'Volver al calendario':'La lista del bebé');
     render(); hintIdle();
     if(TOUR&&!enLista) tourVuelve();   // tutorial: al salir de la lista se vuelve al onboarding
+  });
+  $('lstSeccion').addEventListener('click',ev=>{
+    const b=ev.target.closest('button[data-seccion]'); if(!b) return;
+    SECCION=b.dataset.seccion; pintaLista();
+  });
+  $('trGrupos').addEventListener('click',ev=>{
+    const b=ev.target.closest('[data-tchk]'); if(!b) return;
+    const id=b.dataset.tchk;
+    if(S.tramites[id]==='c') delete S.tramites[id]; else S.tramites[id]='c';
+    guardar(); pintaTramites();
   });
   $('listaVista').addEventListener('click',ev=>{
     const t=ev.target.closest('[data-chk],[data-x],[data-rest]');

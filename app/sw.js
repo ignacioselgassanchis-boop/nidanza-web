@@ -5,7 +5,7 @@
    peticiones ni se tocan.
    Para publicar una versión nueva basta con subir VERSION: se descarga todo otra vez
    y se borran las cachés viejas. */
-const VERSION = 'allonest-v55';
+const VERSION = 'allonest-v56';
 
 const RECURSOS = [
   './',
