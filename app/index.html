@@ -1380,6 +1380,21 @@ function encadenar(k){
 const OBL=42;                                   // días de permiso obligatorio
 const bloqueEn=(P,i)=>{for(const st of P.sem) if(i>=st&&i<st+7) return st; return null;};
 const solapa=(P,s)=>{for(const st of P.sem) if(s<st+7&&st<s+7) return true; return false;};
+/* === bloque:bolsas === */
+// días de vacaciones o lactancia del mismo progenitor que quedarían debajo de una semana que empieza en s
+const pisa=(P,s)=>{let v=0,l=0;for(let j=0;j<7;j++){if(P.vac.has(s+j))v++;if(P.lac.has(s+j))l++;}return {v,l,n:v+l};};
+const pisaTxt=(P,p)=>{const x=[];if(p.v)x.push(p.v+(p.v===1?' día de vacaciones':' días de vacaciones'));
+  if(p.l)x.push(p.l+(p.l===1?' día de lactancia':' días de lactancia'));return x.join(' y ')+' de '+P.nom;};
+// una bolsa no puede pisar a otra: un día de vacaciones o lactancia debajo de una semana de permiso
+// contaba como gastado sin verse. Devuelve cuántos días se han devuelto a su cuenta.
+function saneaBolsas(P,obl){
+  let n=0;
+  const bajoSemana=i=>{for(const st of P.sem) if(i>=st&&i<st+7) return true; return false;};
+  [...P.vac].forEach(i=>{ if(bajoSemana(i)){ P.vac.delete(i); n++; } });
+  [...P.lac].forEach(i=>{ if(bajoSemana(i)||P.vac.has(i)){ P.lac.delete(i); n++; } });
+  return n;
+}
+/* === /bloque:bolsas === */
 const flexUsadas=P=>[...P.sem].filter(s=>s>=OBL).length;
 const semanaDe=(P,i)=>bloqueEn(P,i)!==null;
 const NOMBOLSA={permiso:'permiso flexible',vac:'vacaciones',lact:'lactancia acumulada'};
@@ -1406,7 +1421,7 @@ function recolocar(k){
   let quedan=malas.length;
   const pasada=evitarOtro=>{
     for(let s=OBL;s<=TOPE&&quedan>0;s+=7){
-      if(solapa(P,s)||semanaInutil(P,nac,s)) continue;
+      if(solapa(P,s)||semanaInutil(P,nac,s)||pisa(P,s).n) continue;
       if(evitarOtro&&bi()&&solapa(S[otro],s)) continue;
       P.sem.add(s); quedan--;
     }
@@ -1538,6 +1553,8 @@ function clicDia(i){
       if(i>TOPE){ hint('La semana tiene que caber antes de los 12 meses: el último arranque posible es el '+fmt(addDays(nac,TOPE))+'.'); return; }
       if(flexUsadas(P)>=cupoSem().disp){ hint('No quedan semanas de permiso en la cuenta de '+P.nom+'.'); return; }
       if(solapa(P,i)){ hint('Se pisaría con otra semana ya cogida de '+P.nom+'. Empieza más tarde o quita antes la de al lado.'); return; }
+      const pz=pisa(P,i);
+      if(pz.n){ hint('Esa semana pisa '+pisaTxt(P,pz)+'. Quítalos antes o empieza otra semana.'); return; }
       P.sem.add(i);
       if(semanaInutil(P,nac,i)) hint('Ojo: esa semana es casi toda vacaciones escolares de '+P.nom+' ('+diasEsc(P,nac,i)+' de 7 días). Gastas permiso para nada.');
       else hint('Semana cogida: del '+fmt(addDays(nac,i))+' al '+fmt(addDays(nac,i+6))+'.');
@@ -1547,6 +1564,7 @@ function clicDia(i){
     if(t==='lact'&&i>=lim9()){ hint('La lactancia acumulada tiene que quedar antes de los 9 meses: como tarde el '+fmt(addDays(nac,lim9()-1))+'.'); return; }
     if(!esLaborable(d)){ hint(esFinde(d)?'Fin de semana: no gasta días. Se rellena solo si queda dentro de un tramo.':'Festivo: no gasta días. Se rellena solo si queda dentro de un tramo.'); return; }
     if(semanaDe(P,i)){ hint('Ese día ya está cubierto con permiso.'); return; }
+    if((t==='vac'?P.lac:P.vac).has(i)){ hint('Ese día ya '+(t==='vac'?'es lactancia acumulada':'son vacaciones')+' de '+P.nom+'. Quítalo antes.'); return; }
     if(escDia(P,d)){ hint('Ese día ya son vacaciones escolares de '+P.nom+'.'); return; }
     if(set.has(i)) set.delete(i);
     else{
@@ -1571,7 +1589,7 @@ function util(P,t,i){
   if(t==='permiso') return true;
   if(t==='lact'&&i>=lim9()) return false;
   const d=addDays(parseISO(S.nac),i);
-  return esLaborable(d)&&!semanaDe(P,i)&&!escDia(P,d);
+  return esLaborable(d)&&!semanaDe(P,i)&&!escDia(P,d)&&!(t==='vac'?P.lac:P.vac).has(i);
 }
 // si el arrastre arranca sobre un día que no gasta (un domingo, un festivo),
 // mirar el primero del tramo que sí gaste para decidir si se pinta o se borra
@@ -1640,6 +1658,7 @@ function aplicaRango(lo,hi,borrar){
         if(s>TOPE){ motivo='se sale del primer año'; break; }
         if(flexUsadas(P)>=cupoSem().disp){ motivo='se acabó la cuenta de '+P.nom; break; }
         if(solapa(P,s)){ motivo='choca con otra semana ya cogida'; continue; }
+        if(pisa(P,s).n){ motivo='pisa vacaciones o lactancia ya puestas'; continue; }
         P.sem.add(s); n++;
       }
       hint(n?(n+(n===1?' semana cogida':' semanas cogidas')+(motivo?', y ahí paré: '+motivo+'.':'.')):
@@ -1656,7 +1675,7 @@ function aplicaRango(lo,hi,borrar){
         const d=addDays(nac,i);
         if(set.has(i)) continue;
         if(t==='lact'&&i>=lim9()){ motivo='la lactancia acumulada acaba a los 9 meses'; break; }
-        if(!esLaborable(d)||semanaDe(P,i)||escDia(P,d)){ saltados++; continue; }
+        if(!esLaborable(d)||semanaDe(P,i)||escDia(P,d)||(t==='vac'?P.lac:P.vac).has(i)){ saltados++; continue; }
         if(set.size>=tot){ motivo='se acabó la cuenta'; break; }
         set.add(i); n++;
       }
@@ -1981,6 +2000,7 @@ function aplica(d){
     P.lacAuto=typeof o.lacAuto==='boolean'?o.lacAuto:(typeof o.lacTot!=='number'||o.lacTot===15);
     P.doc=!!o.doc;
     if(o.esc&&typeof o.esc==='object') Object.assign(P.esc,o.esc);
+    saneaBolsas(P);   // un guardado anterior podía tener días debajo de una semana
   });
   // perfil del onboarding. Un guardado anterior a esta versión no lo trae: se conserva el
   // que hubiera (los defaults en el arranque), con onboardingHecho=false, y la bienvenida sale
@@ -3082,6 +3102,7 @@ function render(op){
     return;
   }
   $('vacio').hidden=true; $('plan').hidden=false; $('paleta').hidden=false;
+  saneaBolsas(S.a); saneaBolsas(S.b);
   let R=calcular();
   if(aplicaLactAuto(R)) R=calcular();   // el total de lactancia depende de lo pintado
   pintaMeses(R); pintaB8(); pintaRes(R); pintaCinta(R); pintaLeyenda(); pintaPaleta(R);
