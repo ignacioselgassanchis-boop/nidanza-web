@@ -523,7 +523,7 @@ html,body{overscroll-behavior-y:contain}
         <div class="lst-cab"><h2 id="lstTitulo">La lista del bebé</h2><span class="cnt" id="lstCnt"></span></div>
         <p class="aj-nota" style="margin:0 0 10px">Lo que hace falta, semana a semana. Los enlaces de ejemplo llevan afiliado: no te cuestan más y ayudan a mantener la app.</p>
         <div class="lst-acciones">
-          <button type="button" class="cta" id="btEnviarLista" style="padding:10px 18px;font-size:14px">Enviar la lista</button>
+          <button type="button" class="cta" id="btEnviarLista" style="padding:10px 18px;font-size:14px">Preparar la lista</button>
           <button type="button" class="mini" id="btNuevoItem">Añadir algo</button>
         </div>
         <div class="seg seg-lista" id="lstModo" role="group" aria-label="Cómo ordenar la lista">
@@ -3707,6 +3707,7 @@ function pintaLista(){
   $('trSeccion').hidden=SECCION!=='tramites'; $('lstSeccionCuerpo').hidden=SECCION==='tramites';
   if(SECCION==='tramites'){ pintaTramites(); return; }
   $('lstTitulo').textContent=S.perfil.apodo?'La lista de '+S.perfil.apodo:'La lista del bebé';
+  $('btEnviarLista').textContent=S.perfil.apodo?'Preparar la lista de '+S.perfil.apodo:'Preparar la lista';
   const items=itemsLista(), est=id=>S.lista.estado[id]||'p';
   const vivos=items.filter(it=>est(it.id)!=='x');
   const hechos=vivos.filter(it=>est(it.id)==='c').length;
@@ -3793,7 +3794,9 @@ function pintaEnviar(){
   actualizaEnviar();
 }
 function actualizaEnviar(){
-  const n=SELENV.size, t='Enviar el texto'+(n?' · '+n+(n===1?' artículo':' artículos'):'');
+  const ap0=(S.perfil.apodo||'').trim();
+  $('tEnviar').textContent=ap0?'La lista de '+ap0:'Enviar la lista';
+  const n=SELENV.size, t=(ap0?'Enviar la lista de '+ap0:'Enviar la lista')+(n?' · '+n+(n===1?' artículo':' artículos'):'');
   $('btEnvTexto').textContent=t;
   $('btEnvTexto2').textContent=t;   // el duplicado de arriba, para quien no llega abajo
   // la página lleva el nombre del peque: «Enviar la página de Kumquat»
