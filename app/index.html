@@ -1280,9 +1280,9 @@ const S={
   hijos:1,       // bebés que nacen: 2 = mellizos, 3 = trillizos (una semana más por cada uno a partir del segundo)
   disc:false,    // hijo con discapacidad: una semana más (art. 48.6 ET)
   brush:{p:'a',t:'permiso'},
-  a:{nom:'Progenitor A', sem:new Set(), vac:new Set(), lac:new Set(), vacTot:22, vacPrev:0, lacTot:15,
+  a:{nom:'Progenitor A', sem:new Set(), vac:new Set(), lac:new Set(), vacTot:22, vacPrev:0, lacTot:15, jornada:8, lacAuto:true,
      doc:false, esc:{nadal:true,extra:true,pascua:true,verano:true,pf:8,vIni:'10/07',vFin:'01/09'}},
-  b:{nom:'Progenitor B', sem:new Set(), vac:new Set(), lac:new Set(), vacTot:22, vacPrev:0, lacTot:15,
+  b:{nom:'Progenitor B', sem:new Set(), vac:new Set(), lac:new Set(), vacTot:22, vacPrev:0, lacTot:15, jornada:8, lacAuto:true,
      doc:false, esc:{nadal:true,extra:true,pascua:true,verano:true,pf:8,vIni:'10/07',vFin:'01/09'}},
   // docenteQuien: 1 o 2 cuando docente es 'uno'; 0 en el resto de casos
   perfil:{apodo:'', progenitores:['',''], comunidad:'', docente:'no', docenteQuien:0, onboardingHecho:false},
@@ -1463,6 +1463,31 @@ function vuelta(dias,k){
   }
   return null;                              // el año entero queda cubierto
 }
+/* Lactancia acumulada calculada: una hora por bebé por cada día laborable en que el progenitor
+   TRABAJA antes de los 9 meses (no está de permiso, vacaciones ni calendario escolar), entre
+   las horas de su jornada. Así el permiso fraccionado sale bien solo: los días de casa no suman.
+   Los propios días de lactancia se cuentan como trabajados para no morder la cola. */
+function lactCalc(k,R){
+  const P=S[k], fin=Math.min(H,lim9()); let lab=0, trab=0;
+  for(let i=0;i<fin;i++){
+    const x=R.dias[i]; if(!esLaborable(x.d)) continue;
+    lab++;
+    const e=x[k]; if(e&&e!=='lact'&&e!=='auto') continue;
+    trab++;
+  }
+  const horas=trab*(S.hijos||1), jor=P.jornada||8;
+  return {dias:Math.floor(horas/jor), horas, trab, lab, jor};
+}
+// aplica el cálculo a quien lo tenga en automático; devuelve true si algún total cambió
+function aplicaLactAuto(R){
+  let cambio=false;
+  (bi()?['a','b']:['a']).forEach(k=>{
+    const P=S[k]; if(!P.lacAuto) return;
+    const n=lactCalc(k,R).dias;
+    if(n!==P.lacTot){ P.lacTot=n; while(P.lac.size>n) P.lac.delete(Math.max.apply(null,[...P.lac])); cambio=true; }
+  });
+  return cambio;
+}
 function edad(nac,d){
   let m=(d.getFullYear()-nac.getFullYear())*12+(d.getMonth()-nac.getMonth());
   if(d.getDate()<nac.getDate())m--;
@@ -1485,7 +1510,7 @@ const TIP={
   permiso:'El resto del permiso retribuido del primer año. Se piden <b>por semanas completas</b>, y la semana arranca el día que pulsas: si marcas un lunes 26, coges del 26 al domingo 2. Hay que avisar a la empresa con 15 días, y lo que no se use antes de los 12 meses se pierde. Las <b>2 semanas extra</b> no caducan al año: se pueden guardar hasta que el peque cumpla 8.',
   esc:'Bloques fijos de Navidad a Reyes, Semana Santa y Pascua, el verano y la fiesta grande de la comunidad. Son orientativos y editables. <b>Gastar permiso encima es tirarlo</b>, porque ya estarías en casa igual.',
   vac:'Se cuentan en <b>días de trabajo</b>, no naturales: los fines de semana y festivos que caen dentro de un tramo salen gratis y se rellenan solos. Por eso colocarlas sobre Fallas o Semana Santa estira la cobertura.',
-  lact:'La hora diaria de lactancia hasta los 9 meses, juntada en un bloque de días seguidos. Lo normal son <b>13-15 laborables</b>, pero manda tu convenio: ajusta el total abajo.'
+  lact:'La hora diaria de lactancia hasta los 9 meses, juntada en un bloque de días seguidos. <b>Se calcula sola desde tu calendario</b>: una hora por bebé por cada día que trabajas antes de los 9 meses, entre tu jornada. Si el permiso va fraccionado, la cuenta lo tiene en cuenta: los días de casa no suman. Manda tu convenio: si fija otra cifra, ponla abajo.'
 };
 
 function clicDia(i){
@@ -1840,7 +1865,7 @@ const LLAVE='gestor-baja', ESQUEMA=2;
 let DUENO=null;
 function instantanea(){
   const p=k=>({nom:S[k].nom,sem:[...S[k].sem],vac:[...S[k].vac],lac:[...S[k].lac],
-               vacTot:S[k].vacTot,vacPrev:S[k].vacPrev,lacTot:S[k].lacTot,doc:S[k].doc,esc:S[k].esc});
+               vacTot:S[k].vacTot,vacPrev:S[k].vacPrev,lacTot:S[k].lacTot,jornada:S[k].jornada,lacAuto:S[k].lacAuto,doc:S[k].doc,esc:S[k].esc});
   return {esquema:ESQUEMA,guardado:new Date().toISOString(),
           uid:(SES&&SES.user&&SES.user.id)||DUENO||null,
           nac:S.nac,ca:S.ca,loc:S.loc,
@@ -1938,6 +1963,10 @@ function aplica(d){
     if(typeof o.vacTot==='number') P.vacTot=o.vacTot;
     if(typeof o.vacPrev==='number') P.vacPrev=Math.max(0,Math.min(60,o.vacPrev));
     if(typeof o.lacTot==='number') P.lacTot=o.lacTot;
+    P.jornada=typeof o.jornada==='number'?Math.max(4,Math.min(12,o.jornada)):8;
+    // un guardado anterior a esta versión no trae lacAuto: si nunca tocó el total (15 de serie), se calcula solo;
+    // si lo había ajustado a mano (su convenio), se respeta
+    P.lacAuto=typeof o.lacAuto==='boolean'?o.lacAuto:(typeof o.lacTot!=='number'||o.lacTot===15);
     P.doc=!!o.doc;
     if(o.esc&&typeof o.esc==='object') Object.assign(P.esc,o.esc);
   });
@@ -3033,7 +3062,8 @@ function render(op){
     return;
   }
   $('vacio').hidden=true; $('plan').hidden=false; $('paleta').hidden=false;
-  const R=calcular();
+  let R=calcular();
+  if(aplicaLactAuto(R)) R=calcular();   // el total de lactancia depende de lo pintado
   pintaMeses(R); pintaB8(); pintaRes(R); pintaCinta(R); pintaLeyenda(); pintaPaleta(R);
   if(!(op&&op.vivo)) pintaHojaBolsa();
   guardar();
@@ -3076,8 +3106,19 @@ function pintaHojaBolsa(){
               'colocan fuera del calendario escolar.':'Se suman a la bolsa de vacaciones.')+'</p>';
   }
   if(t==='lact'){
-    o+='<div class="ver">Total <input type="number" min="0" max="40" value="'+P.lacTot+
-       '" data-tot="lac" aria-label="Total de días de lactancia"> días laborables</div>';
+    const R=calcular(), c=lactCalc(k,R), vuelta=k==='a'?R.vueltaA:R.vueltaB;
+    const quien=P.nom, bebes=(S.hijos||1)>1?' × '+S.hijos+' bebés':'';
+    o+='<div class="tit-b" style="margin-top:16px">La cuenta</div>'+
+       '<p>Con lo que hay pintado, '+esc(quien)+(vuelta?' vuelve al trabajo el <b>'+fmt(vuelta)+'</b> y':'')+
+       ' trabaja <b>'+c.trab+' días laborables</b> antes de los 9 meses (de '+c.lab+' posibles). '+
+       'Una hora por día'+bebes+' son <b>'+c.horas+' horas</b>; entre una jornada de '+c.jor+' h, <b>'+c.dias+(c.dias===1?' día':' días')+'</b>. '+
+       'Si mueves una semana de permiso, la cuenta cambia sola.</p>'+
+       '<div class="ver">Jornada <input type="number" min="4" max="12" step="0.5" value="'+P.jornada+
+       '" data-jornada="1" aria-label="Horas de jornada al día"> horas al día</div>'+
+       '<label class="f chk" style="margin:8px 0"><input type="checkbox" data-lacauto="1"'+(P.lacAuto?' checked':'')+'>Calcular los días desde el calendario</label>'+
+       '<div class="ver">Total <input type="number" min="0" max="40" value="'+P.lacTot+'"'+(P.lacAuto?' disabled':'')+
+       ' data-tot="lac" aria-label="Total de días de lactancia"> días laborables</div>'+
+       (P.lacAuto?'':'<p class="ayuda" style="margin-top:4px">Total fijado a mano (por convenio, por ejemplo). Marca la casilla para volver al cálculo.</p>');
   }
   if(t==='esc'){
     const E=P.esc, CE=CCAA[S.ca].esc, exn=CE.ex?EXNOM[CE.ex]:null;
@@ -3107,6 +3148,13 @@ function pintaHojaBolsa(){
     };
     inp.addEventListener('input',()=>{lee(); render({vivo:true});});
     inp.addEventListener('change',()=>{lee(); render();});
+  });
+  c.querySelectorAll('[data-jornada]').forEach(inp=>{
+    const lee=()=>{ P.jornada=Math.max(4,Math.min(12,+inp.value||8)); };
+    inp.addEventListener('change',()=>{ lee(); render(); });
+  });
+  c.querySelectorAll('[data-lacauto]').forEach(inp=>{
+    inp.addEventListener('change',()=>{ P.lacAuto=inp.checked; render(); });
   });
   c.querySelectorAll('[data-vprev]').forEach(inp=>{
     const lee=()=>{
