@@ -857,6 +857,18 @@ html,body{overscroll-behavior-y:contain}
       </label>
       <p class="ayuda" id="obApodoAyuda">El nombre que usáis en casa hasta que llegue.</p>
     </div>
+    <fieldset class="campo">
+      <legend>¿Quiénes sois?</legend>
+      <label class="f chk"><input type="radio" name="obFam" value="bi" checked>Dos progenitores · 19 semanas cada uno</label>
+      <label class="f chk"><input type="radio" name="obFam" value="mono">Familia monoparental · 32 semanas</label>
+    </fieldset>
+    <fieldset class="campo">
+      <legend>¿Cuántos bebés vienen?</legend>
+      <label class="f chk"><input type="radio" name="obHijos" value="1" checked>Uno</label>
+      <label class="f chk"><input type="radio" name="obHijos" value="2">Mellizos · una semana más cada uno</label>
+      <label class="f chk"><input type="radio" name="obHijos" value="3">Trillizos · dos semanas más cada uno</label>
+      <p class="ayuda">Si el bebé tiene una discapacidad reconocida también suma una semana; se marca en Ajustes.</p>
+    </fieldset>
     <p class="error" id="obErr1" role="alert" hidden></p>
     <div class="acciones"><button type="submit" class="cta">Continuar</button></div>
   </form>
@@ -873,7 +885,7 @@ html,body{overscroll-behavior-y:contain}
       <label class="f">Progenitor 2
         <input type="text" id="obProg2" maxlength="16" autocomplete="off" aria-describedby="obProg2Ayuda">
       </label>
-      <p class="ayuda" id="obProg2Ayuda">Puede quedar vacío si sois familia monoparental.</p>
+      <p class="ayuda" id="obProg2Ayuda">En familia monoparental, déjalo vacío.</p>
     </div>
     <div class="campo">
       <label class="f">Comunidad autónoma
@@ -3208,6 +3220,8 @@ function abreOnb(modo){
   cierraHoja();
   $('obFpp').value=CONFIG?S.nac:''; fechaPinta($('obFpp'));
   $('obApodo').value=S.perfil.apodo;
+  const rf=document.querySelector('input[name="obFam"][value="'+S.familia+'"]'); if(rf) rf.checked=true;
+  const rh=document.querySelector('input[name="obHijos"][value="'+(S.hijos||1)+'"]'); if(rh) rh.checked=true;
   sugiereFruta();
   $('obErr1').hidden=true;
   $('obProg1').value=S.perfil.progenitores[0]||(S.a.nom!=='Progenitor A'?S.a.nom:'');
@@ -3237,12 +3251,26 @@ function pintaQuienDoc(){
   $('obDocQ1').textContent=$('obProg1').value.trim()||'Progenitor 1';
   $('obDocQ2').textContent=$('obProg2').value.trim()||'Progenitor 2';
 }
+// cambiar de familia: en monoparental el segundo progenitor se vacía; en pareja recupera sus 6 obligatorias
+function fijaFamilia(v){
+  S.familia=v==='mono'?'mono':'bi';
+  if(!bi()){
+    S.b.sem=new Set(); S.b.vac=new Set(); S.b.lac=new Set();
+    if(S.brush.p==='b') S.brush={p:'a',t:'permiso'};
+  } else if(CONFIG){
+    for(let i=0;i<6;i++) S.b.sem.add(i*7);   // el otro progenitor también tiene sus 6 obligatorias
+  }
+}
 function guardaPaso1(){
   const fpp=$('obFpp').value, apodo=$('obApodo').value.trim().slice(0,20), err=$('obErr1');
   if(!fpp){ err.textContent='Nos falta la fecha prevista de parto.'; err.hidden=false; $('obFppBtn').focus(); return; }
   if(!apodo){ err.textContent='Ponle un nombre, aunque sea provisional.'; err.hidden=false; $('obApodo').focus(); return; }
   err.hidden=true;
   S.perfil.apodo=apodo;
+  const fam=(document.querySelector('input[name="obFam"]:checked')||{}).value||'bi';
+  const hijos=+((document.querySelector('input[name="obHijos"]:checked')||{}).value||1);
+  if(fam!==S.familia) fijaFamilia(fam);
+  if(hijos!==S.hijos){ S.hijos=hijos; recortaSem(S.a); recortaSem(S.b); }
   if(fpp!==S.nac||!CONFIG) fijaFecha(fpp); else render();
   muestraPasoOnb('obPaso2');
 }
@@ -3995,16 +4023,7 @@ async function init(){
     S.perfil.apodo=$('ajApodo').value.trim().slice(0,20);
     guardar();
   });
-  $('familia').addEventListener('change',()=>{
-    S.familia=$('familia').value;
-    if(!bi()){
-      S.b.sem=new Set(); S.b.vac=new Set(); S.b.lac=new Set();
-      if(S.brush.p==='b') S.brush={p:'a',t:'permiso'};
-    } else if(CONFIG){
-      for(let i=0;i<6;i++) S.b.sem.add(i*7);   // el otro progenitor también tiene sus 6 obligatorias
-    }
-    render(); pintaAjustes();
-  });
+  $('familia').addEventListener('change',()=>{ fijaFamilia($('familia').value); render(); pintaAjustes(); });
   // más o menos semanas extra: si el cupo baja, sobran semanas ya puestas y se devuelven las últimas
   const cambiaExtra=()=>{ recortaSem(S.a); recortaSem(S.b); render(); pintaAjustes(); };
   $('hijos').addEventListener('change',()=>{ S.hijos=+$('hijos').value||1; cambiaExtra(); });
