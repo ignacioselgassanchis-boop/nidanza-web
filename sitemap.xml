@@ -14,6 +14,18 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://allonest.es/tramites-baja-parental/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://allonest.es/preguntas-frecuentes-baja-parental/</loc>
+    <lastmod>2026-08-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://allonest.es/repartir-baja-parental-pareja/</loc>
     <lastmod>2026-08-25</lastmod>
     <changefreq>monthly</changefreq>
