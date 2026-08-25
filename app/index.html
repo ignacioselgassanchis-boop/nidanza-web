@@ -618,7 +618,7 @@ html,body{overscroll-behavior-y:contain}
       <button type="button" class="mini" id="btExportar">Exportar el reparto (.json)</button>
       <button type="button" class="mini" id="btImportar">Importar un reparto</button>
     </div>
-    <p class="aj-nota">El reparto se guarda en este dispositivo. Exporta un archivo para hacer copia o pasárselo al otro progenitor.</p>
+    <p class="aj-nota">El reparto se guarda en tu cuenta y en este dispositivo. Exporta un archivo si quieres una copia aparte o pasárselo a alguien.</p>
     <input type="file" id="ficheroImp" accept="application/json,.json" class="oculto">
     <div class="aj-sep"></div>
     <div class="tit-b">Compartir con tu pareja</div>
@@ -769,7 +769,7 @@ html,body{overscroll-behavior-y:contain}
     <h2>Qué sale de tu móvil</h2>
     <ul>
       <li>Solo <b>tu cuenta</b>: el correo con el que entras y, si eliges Google, lo que Google nos devuelve de ti (correo y nombre). Sirve para dejarte entrar y para nada más.</li>
-      <li><b>El reparto no sale mientras no compartas</b>. Se calcula y se guarda en este dispositivo, y una vez has entrado la aplicación funciona sin conexión. Si activas <b>Compartir con tu pareja</b>, el reparto sube al mismo servidor propio de las cuentas para que los dos veáis y toquéis el mismo calendario; a nadie más.</li>
+      <li><b>El reparto se guarda en tu cuenta</b>. Se calcula en el móvil y sube a nuestro propio servidor, en la Unión Europea, donde solo lo lee tu cuenta —así lo recuperas si cambias de móvil—; una vez has entrado, la aplicación funciona sin conexión. Si activas <b>Compartir con tu pareja</b>, los dos veis y tocáis el mismo calendario; a nadie más.</li>
       <li>No hay <b>analítica ni anuncios</b>, y no se pide nada a terceros: la única red que abre la aplicación es la de su propio servidor — las cuentas y, si compartes, el calendario del hogar.</li>
       <li>Los enlaces de <b>la lista del bebé</b> se abren en tu navegador, fuera de la aplicación, y pueden llevar etiqueta de afiliado; el aviso está en la propia lista.</li>
       <li>El <b>catálogo de la lista</b> (artículos y enlaces) se baja de ese mismo servidor al abrir la aplicación, para poder ampliarlo sin publicar versión nueva. En esa petición no sube nada tuyo: lo comprado y lo descartado se quedan en tu dispositivo.</li>
@@ -839,7 +839,7 @@ html,body{overscroll-behavior-y:contain}
     <h1 id="obTitulo">Enhorabuena</h1>
     <p class="sub">Empieza el año más intenso de vuestra vida. Vamos a dejarlo organizado.</p>
     <div class="acciones"><button type="button" class="cta" id="obEmpezar">Empezar</button></div>
-    <p class="ayuda" style="margin-top:20px">El reparto se queda en este dispositivo: de tu cuenta solo guardamos el correo con el que entras.</p>
+    <p class="ayuda" style="margin-top:20px">Tu cuenta guarda el correo con el que entras y tu calendario, en nuestro propio servidor en la Unión Europea; solo tú puedes leerlo.</p>
   </section>
 
   <form class="paso" id="obPaso1" hidden novalidate>
@@ -2598,16 +2598,29 @@ async function sincArranque(){
     try{
       const m=await pg('GET','miembros?select=hogar_id&user_id=eq.'+SES.user.id);
       if(m&&m.length){ HOGAR={id:m[0].hogar_id,rev:0}; guardaHogar(); await bajaYSustituye(); }
+      else await hogarDeUno();
     }catch(e){}
   }else sincRefresca();
   if(HOGAR&&!SINC_T) SINC_T=setInterval(()=>{ if(!document.hidden) sincRefresca(); },60000);
   window.addEventListener('online',()=>{ if(HOGAR) subeLuego(); });
   revisaInvitaPendiente();
 }
+/* Hogar de uno: el reparto de quien no comparte también vive en el servidor (sobrevive a
+   un cambio de móvil y a que Safari vacíe el almacén local). Mismo documento, misma
+   maquinaria de subir/bajar; la única diferencia es que el hogar tiene un solo miembro. */
+async function hogarDeUno(){
+  const r=await pg('POST','rpc/mi_hogar_o_crea',{datos:instantanea()});
+  HOGAR={id:r.hogar,rev:Number(r.rev)||1}; guardaHogar();
+  BASE=instantanea(); guardaBase();
+  if(!SINC_T) SINC_T=setInterval(()=>{ if(!document.hidden) sincRefresca(); },60000);
+  if(MONTADA) subeLuego();   // por si el documento de arranque era el vacío
+}
 async function dejaHogar(){
-  try{ await pg('DELETE','miembros?user_id=eq.'+SES.user.id,null,{Prefer:'return=minimal'}); }catch(e){}
+  try{ await pg('POST','rpc/dejar_hogar',{}); }
+  catch(e){ try{ await pg('DELETE','miembros?user_id=eq.'+SES.user.id,null,{Prefer:'return=minimal'}); }catch(e2){} }
   HOGAR=null; BASE=null; guardaHogar(); guardaBase();
   clearInterval(SINC_T); SINC_T=null;
+  try{ await hogarDeUno(); }catch(e){}   // vuelve a ser un calendario propio, pero guardado
 }
 
 /* Borrar la cuenta entera. El servidor la elimina (función SQL: si era el último del
@@ -2639,20 +2652,24 @@ async function compartirTexto(txt){
 async function pintaPareja(){
   const e=$('parEstado'); if(!e) return;
   if(!authConfigurado()||!SES){ e.textContent=''; return; }
-  if(!HOGAR){
-    e.textContent='El reparto vive solo en este móvil. Invita a tu pareja y los dos veréis y tocaréis el mismo calendario.';
+  const solo=()=>{
+    e.textContent='Tu calendario está guardado en tu cuenta. Invita a tu pareja y los dos veréis y tocaréis el mismo.';
     $('btDejar').hidden=true; $('btInvitar').hidden=false; $('btUnirse').hidden=false;
-    return;
-  }
-  $('btDejar').hidden=false; $('btUnirse').hidden=true; $('btInvitar').hidden=false;
-  $('btInvitar').textContent='Nueva invitación';
-  e.textContent='Calendario compartido.';
+    $('btInvitar').textContent='Invitar a tu pareja';
+  };
+  if(!HOGAR){ solo(); return; }
   try{
     const m=await pg('GET','miembros?select=user_id,nombre&hogar_id=eq.'+HOGAR.id);
     const otro=(m||[]).find(x=>x.user_id!==SES.user.id);
-    e.textContent=otro?'Compartido con '+(otro.nombre||'tu pareja')+'. Los cambios de cada uno aparecen en el móvil del otro.'
-                      :'Invitación creada: falta que tu pareja se una.';
-  }catch(err){}
+    if(!otro){
+      solo();
+      if(!$('parInvitacion').hidden) e.textContent='Invitación creada: falta que tu pareja se una.';
+      return;
+    }
+    $('btDejar').hidden=false; $('btUnirse').hidden=true; $('btInvitar').hidden=false;
+    $('btInvitar').textContent='Nueva invitación';
+    e.textContent='Compartido con '+(otro.nombre||'tu pareja')+'. Los cambios de cada uno aparecen en el móvil del otro.';
+  }catch(err){ e.textContent='Calendario guardado en tu cuenta.'; }
 }
 function pintaErrPar(msg){ const e=$('parErr'); if(e){ e.textContent=msg||''; e.hidden=!msg; } }
 function abreCanje(cod){
@@ -2718,7 +2735,7 @@ function enganchaPareja(){
     await dejaHogar();
     ocupado($('btDejar'),false);
     pintaPareja();
-    hint('Este calendario vuelve a ser solo tuyo. Tu copia se queda en el móvil.');
+    hint('Este calendario vuelve a ser solo tuyo, y sigue guardado en tu cuenta.');
   });
 
   // eliminar la cuenta: dos pasos, y el destructivo bien a la vista de lo que hace
