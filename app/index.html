@@ -796,7 +796,7 @@ html,body{overscroll-behavior-y:contain}
   <div class="hoja-cuerpo">
     <div class="aj-fila" style="margin-bottom:8px">
       <button type="button" class="cta" id="btEnvTexto2" style="flex:1 1 46%;padding:10px 12px;font-size:14px">Enviar el texto</button>
-      <button type="button" class="cta" id="btEnvPagina2" style="flex:1 1 46%;padding:10px 12px;font-size:14px;background:var(--azulF)">Enviar página bonita</button>
+      <button type="button" class="cta" id="btEnvPagina2" style="flex:1 1 46%;padding:10px 12px;font-size:14px;background:var(--azulF)">Enviar como página</button>
     </div>
     <p class="aj-nota" style="margin:0 0 8px">El texto lleva los enlaces: en WhatsApp solo queda elegir a quién. La página bonita es un archivo que se abre en cualquier navegador, para enseñar la lista sin dar acceso a la app.</p>
     <div class="aj-fila" style="margin-bottom:2px">
@@ -3636,7 +3636,10 @@ function actualizaEnviar(){
   const n=SELENV.size, t='Enviar el texto'+(n?' · '+n+(n===1?' artículo':' artículos'):'');
   $('btEnvTexto').textContent=t;
   $('btEnvTexto2').textContent=t;   // el duplicado de arriba, para quien no llega abajo
-  $('btEnvPagina').textContent='Enviar como página de solo lectura';
+  // la página lleva el nombre del peque: «Enviar la página de Kumquat»
+  const ap=(S.perfil.apodo||'').trim();
+  $('btEnvPagina2').textContent=ap?'Enviar la página de '+ap:'Enviar como página';
+  $('btEnvPagina').textContent=(ap?'Enviar la página de '+ap:'Enviar como página')+' (solo lectura)';
   $('btEnvTexto').disabled=!n; $('btEnvTexto2').disabled=!n; $('btEnvPagina').disabled=!n; $('btEnvPagina2').disabled=!n;
 }
 function textoLista(sel){
