@@ -931,7 +931,7 @@ html,body{overscroll-behavior-y:contain}
        el bloque CSS "tutorial", el span #puntoLista y las líneas marcadas "tutorial" en el JS ===== -->
   <section class="paso" id="obPaso3" hidden aria-labelledby="obT3">
     <p class="paso-n">Antes de empezar</p>
-    <h2 id="obT3">Tres cosas que viven arriba</h2>
+    <h2 id="obT3">Cuatro cosas antes de empezar</h2>
     <div class="ob-feats">
       <div class="ob-feat">
         <span class="ic"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.6 4.4l1.2 1.2 2-2M2.6 9l1.2 1.2 2-2M2.6 13.6l1.2 1.2 2-2M9.2 4.7h6.2M9.2 9.3h6.2M9.2 13.9h6.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
@@ -942,6 +942,10 @@ html,body{overscroll-behavior-y:contain}
         <span class="ic"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="2.7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M14.6 11a1.3 1.3 0 0 0 .26 1.43l.05.05a1.5 1.5 0 1 1-2.13 2.13l-.05-.05a1.3 1.3 0 0 0-1.43-.26 1.3 1.3 0 0 0-.8 1.2v.14a1.5 1.5 0 1 1-3 0v-.07a1.3 1.3 0 0 0-.86-1.2 1.3 1.3 0 0 0-1.43.26l-.05.05a1.5 1.5 0 1 1-2.13-2.13l.05-.05a1.3 1.3 0 0 0 .26-1.43 1.3 1.3 0 0 0-1.2-.8H2A1.5 1.5 0 1 1 2 7h.07a1.3 1.3 0 0 0 1.2-.86 1.3 1.3 0 0 0-.26-1.43l-.05-.05a1.5 1.5 0 1 1 2.13-2.13l.05.05a1.3 1.3 0 0 0 1.43.26H6.6a1.3 1.3 0 0 0 .8-1.2V1.5a1.5 1.5 0 1 1 3 0v.07a1.3 1.3 0 0 0 .8 1.2 1.3 1.3 0 0 0 1.43-.26l.05-.05a1.5 1.5 0 1 1 2.13 2.13l-.05.05a1.3 1.3 0 0 0-.26 1.43V6.2a1.3 1.3 0 0 0 1.2.8h.14a1.5 1.5 0 1 1 0 3h-.07a1.3 1.3 0 0 0-1.2.8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <div><h4>Compartir con tu pareja</h4><p>En Ajustes. Una invitación de un solo uso y los dos veis y tocáis el mismo calendario y la misma lista.</p>
           <button type="button" class="mini ob-ir" id="obVerAjustes">Abrir Ajustes</button></div>
+      </div>
+      <div class="ob-feat">
+        <span class="ic"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.2c2.6 3.2 4.6 5.6 4.6 8.3a4.6 4.6 0 0 1-9.2 0c0-2.7 2-5.1 4.6-8.3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+        <div><h4>La lactancia</h4><p>Vienen 15 días por persona, la cifra habitual. Muchos convenios dan otra (los docentes casi siempre): en el calendario, toca la pastilla <b>Lactancia</b> y cambia el total.</p></div>
       </div>
       <div class="ob-feat">
         <span class="ic"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6.9 6.9a2.2 2.2 0 1 1 3 2.05c-.6.25-.9.75-.9 1.35v.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="9" cy="13.2" r="1" fill="currentColor"/></svg></span>
@@ -1291,9 +1295,9 @@ const S={
   hijos:1,       // bebés que nacen: 2 = mellizos, 3 = trillizos (una semana más por cada uno a partir del segundo)
   disc:false,    // hijo con discapacidad: una semana más (art. 48.6 ET)
   brush:{p:'a',t:'permiso'},
-  a:{nom:'Progenitor A', sem:new Set(), vac:new Set(), lac:new Set(), vacTot:22, vacPrev:0, lacTot:15, jornada:8, lacAuto:true,
+  a:{nom:'Progenitor A', sem:new Set(), vac:new Set(), lac:new Set(), vacTot:22, vacPrev:0, lacTot:15, jornada:8, lacAuto:false,
      doc:false, esc:{nadal:true,extra:true,pascua:true,verano:true,pf:8,vIni:'10/07',vFin:'01/09'}},
-  b:{nom:'Progenitor B', sem:new Set(), vac:new Set(), lac:new Set(), vacTot:22, vacPrev:0, lacTot:15, jornada:8, lacAuto:true,
+  b:{nom:'Progenitor B', sem:new Set(), vac:new Set(), lac:new Set(), vacTot:22, vacPrev:0, lacTot:15, jornada:8, lacAuto:false,
      doc:false, esc:{nadal:true,extra:true,pascua:true,verano:true,pf:8,vIni:'10/07',vFin:'01/09'}},
   // docenteQuien: 1 o 2 cuando docente es 'uno'; 0 en el resto de casos
   perfil:{apodo:'', progenitores:['',''], comunidad:'', docente:'no', docenteQuien:0, onboardingHecho:false},
@@ -1538,7 +1542,7 @@ const TIP={
   permiso:'El resto del permiso retribuido del primer año. Se piden <b>por semanas completas</b>, y la semana arranca el día que pulsas: si marcas un lunes 26, coges del 26 al domingo 2. Hay que avisar a la empresa con 15 días, y lo que no se use antes de los 12 meses se pierde. Las <b>2 semanas extra</b> no caducan al año: se pueden guardar hasta que el peque cumpla 8.',
   esc:'Bloques fijos de Navidad a Reyes, Semana Santa y Pascua, el verano y la fiesta grande de la comunidad. Son orientativos y editables. <b>Gastar permiso encima es tirarlo</b>, porque ya estarías en casa igual.',
   vac:'Se cuentan en <b>días de trabajo</b>, no naturales: los fines de semana y festivos que caen dentro de un tramo salen gratis y se rellenan solos. Por eso colocarlas sobre Fallas o Semana Santa estira la cobertura.',
-  lact:'La hora diaria de lactancia hasta los 9 meses, juntada en un bloque de días seguidos. <b>Se calcula sola desde tu calendario</b>: una hora por bebé por cada día que trabajas antes de los 9 meses, entre tu jornada. Si el permiso va fraccionado, la cuenta lo tiene en cuenta: los días de casa no suman. Manda tu convenio: si fija otra cifra, ponla abajo.'
+  lact:'La hora diaria de lactancia hasta los 9 meses, juntada en un bloque de días seguidos. De serie vienen <b>15 días</b>, la cifra habitual. <b>Manda tu convenio</b>: si fija otra (el personal docente suele tenerla aparte), cámbiala abajo. Si prefieres, marca la casilla y se calcula desde tu calendario: una hora por bebé por cada día que trabajas antes de los 9 meses, entre tu jornada.'
 };
 
 function clicDia(i){
@@ -1997,9 +2001,8 @@ function aplica(d){
     if(typeof o.vacPrev==='number') P.vacPrev=Math.max(0,Math.min(60,o.vacPrev));
     if(typeof o.lacTot==='number') P.lacTot=o.lacTot;
     P.jornada=typeof o.jornada==='number'?Math.max(4,Math.min(12,o.jornada)):8;
-    // un guardado anterior a esta versión no trae lacAuto: si nunca tocó el total (15 de serie), se calcula solo;
-    // si lo había ajustado a mano (su convenio), se respeta
-    P.lacAuto=typeof o.lacAuto==='boolean'?o.lacAuto:(typeof o.lacTot!=='number'||o.lacTot===15);
+    // de serie son 15 días fijos; el cálculo desde el calendario solo si la persona lo marcó
+    P.lacAuto=o.lacAuto===true;
     P.doc=!!o.doc;
     if(o.esc&&typeof o.esc==='object') Object.assign(P.esc,o.esc);
     saneaBolsas(P);   // un guardado anterior podía tener días debajo de una semana
@@ -3161,7 +3164,7 @@ function pintaHojaBolsa(){
        '<label class="f chk" style="margin:8px 0"><input type="checkbox" data-lacauto="1"'+(P.lacAuto?' checked':'')+'>Calcular los días desde el calendario</label>'+
        '<div class="ver">Total <input type="number" min="0" max="40" value="'+P.lacTot+'"'+(P.lacAuto?' disabled':'')+
        ' data-tot="lac" aria-label="Total de días de lactancia"> días laborables</div>'+
-       (P.lacAuto?'':'<p class="ayuda" style="margin-top:4px">Total fijado a mano (por convenio, por ejemplo). Marca la casilla para volver al cálculo.</p>');
+       (P.lacAuto?'':'<p class="ayuda" style="margin-top:4px">De serie son <b>15 días</b>, la cifra habitual. Manda tu convenio: si fija otra, cámbiala aquí. Si marcas la casilla, se calcula desde tu calendario (una hora por día trabajado hasta los 9 meses).</p>');
   }
   if(t==='esc'){
     const E=P.esc, CE=CCAA[S.ca].esc, exn=CE.ex?EXNOM[CE.ex]:null;
