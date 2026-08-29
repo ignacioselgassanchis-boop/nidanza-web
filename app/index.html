@@ -910,16 +910,16 @@ html,body{overscroll-behavior-y:contain}
       <p class="ayuda">Fija los festivos del calendario y servirá para las ayudas y deducciones autonómicas por nacimiento.</p>
     </div>
     <fieldset class="campo">
-      <legend>¿Alguno de los dos es docente o funcionario?</legend>
+      <legend>¿Alguno de los dos es docente?</legend>
       <label class="f chk"><input type="radio" name="obDoc" value="no" checked>No</label>
       <label class="f chk"><input type="radio" name="obDoc" value="uno">Sí, uno</label>
-      <div id="obQuienDoc" role="radiogroup" aria-label="Quién es docente o funcionario" hidden style="margin:8px 0 2px 27px">
+      <div id="obQuienDoc" role="radiogroup" aria-label="Quién es docente" hidden style="margin:8px 0 2px 27px">
         <p class="ayuda" style="margin:0 0 2px">¿Quién?</p>
         <label class="f chk" style="margin-top:6px"><input type="radio" name="obDocQuien" value="1" checked><span id="obDocQ1">Progenitor 1</span></label>
         <label class="f chk" style="margin-top:6px"><input type="radio" name="obDocQuien" value="2"><span id="obDocQ2">Progenitor 2</span></label>
       </div>
       <label class="f chk"><input type="radio" name="obDoc" value="dos">Sí, los dos</label>
-      <p class="ayuda">Afecta al régimen de permisos. Si es docente, sus vacaciones pasan a ser el calendario escolar (se afina en Ajustes).</p>
+      <p class="ayuda">Sus vacaciones pasan a ser el calendario escolar de su comunidad, en vez de una bolsa de días (se afina en Ajustes). Solo docentes: otros funcionarios tienen vacaciones normales.</p>
     </fieldset>
     <div class="acciones">
       <button type="submit" class="cta">Guardar</button>
