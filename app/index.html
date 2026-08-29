@@ -260,6 +260,7 @@ footer{text-align:center;padding:16px 8px 8px;font-size:11px;color:var(--tinta2)
 .aj-sep{height:1px;background:var(--linea);margin:16px 0}
 .aj-fila{display:flex;flex-wrap:wrap;gap:8px}
 .aj-nota{font-size:11.5px;color:var(--tinta2);margin:10px 0 0;line-height:1.45}
+.env-vacio{background:var(--papel2);border:1px dashed var(--linea);border-radius:12px;padding:10px 12px;font-size:12.5px;font-weight:700;color:var(--tinta2);margin:0 0 10px}
 .grid-ctrl{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 label.f{display:flex;flex-direction:column;gap:5px;font-size:10.5px;font-weight:800;color:var(--tinta2);text-transform:uppercase;letter-spacing:.07em}
 label.f input,label.f select{font-size:16px;font-weight:600;color:var(--tinta);padding:10px;border:1px solid var(--linea);border-radius:10px;background:var(--papel2);width:100%}
@@ -357,30 +358,114 @@ a.lex:focus-visible{outline:2px solid var(--azul);outline-offset:2px;border-radi
 /* ============ la lista del bebé ============ */
 .cab-b[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:var(--tinta)}
 
-/* ===== tutorial: paso final del onboarding + punto de la lista sin estrenar ===== */
-.ob-feats{margin:4px 0 6px}
-.ob-feat{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;text-align:left}
-.ob-feat .ic{width:38px;height:38px;flex:0 0 auto;border-radius:12px;background:var(--papel2);
-  border:1px solid var(--linea);color:var(--azul);display:flex;align-items:center;justify-content:center}
-.ob-feat .ic svg{width:19px;height:19px;display:block}
-.ob-feat h4{margin:0;font-size:14.5px}
-.ob-feat p{margin:2px 0 0;font-size:13px;color:var(--tinta2);line-height:1.45}
-.ob-ir{margin-top:8px;display:inline-flex;align-items:center;gap:6px}
-.ob-ir svg{width:15px;height:15px;flex:0 0 auto}
-.ob-fake{position:fixed;inset:0;z-index:75;background:var(--cal);display:flex;flex-direction:column}
-.ob-fake-cab{display:flex;align-items:center;gap:12px;flex:0 0 auto;padding:10px 14px;
-  padding-top:calc(10px + env(safe-area-inset-top));
-  background:rgba(255,243,227,.92);border-bottom:1px solid var(--linea)}
-.ob-fake-cab h2{font-size:18px;flex:1;min-width:0}
-.ob-fake-tag{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--tinta2);background:var(--papel2);border:1px solid var(--linea);border-radius:999px;padding:3px 9px}
-.ob-fake-cuerpo{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
-  -webkit-overflow-scrolling:touch;padding:4px 14px calc(24px + env(safe-area-inset-bottom))}
-.ob-fake-cuerpo .art,.ob-fake-cuerpo .lst-sem{pointer-events:none}
+/* ===== presentación: el paso final del onboarding, en cuatro diapositivas con escenas animadas.
+   También se abre desde Ajustes («Ver la presentación»). Todo va bajo #obPaso3 para no rozar
+   los estilos del calendario (.pill, .pills…). ===== */
+#obPaso3::before,#obPaso3::after{flex:0 0 0}
+.obc{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;margin:-6px -8px 0}
+.obc-top{display:flex;align-items:center;justify-content:space-between;padding:0 8px;flex:0 0 auto}
+.obc-n{font-size:10px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;color:var(--tinta2)}
+.obc-pista{flex:1 1 auto;min-height:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.obc-pista::-webkit-scrollbar{display:none}
+.obc-dia{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column;padding:4px 8px 0;overflow-y:auto;max-width:100%}
+.obc-dia .esc{flex:0 0 auto;margin:4px auto 16px;width:100%;max-width:340px;aspect-ratio:1/1.02;
+  background:var(--cal);border:1px solid var(--linea);border-radius:22px;position:relative;overflow:hidden;
+  box-shadow:0 1px 2px rgba(90,60,35,.04),0 18px 40px -28px rgba(90,60,35,.45)}
+.obc-dia .esc.blanca{background:#fff}
+.onb .obc-dia h2{font-size:22px;line-height:1.15;margin:0 0 8px}
+.obc-dia p{margin:0;font-size:15px;line-height:1.5;color:var(--tinta2);max-width:36ch}
+.obc-dia p b{color:var(--tinta)}
+.obc-pie{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 8px 0}
+.obc-puntos{display:flex;gap:6px}
+.obc-puntos i{width:7px;height:7px;border-radius:50%;background:var(--linea);transition:width .2s,background .2s}
+.obc-puntos i.on{width:20px;border-radius:99px;background:var(--azul)}
+/* la cabecera en miniatura, la misma de la app */
+#obPaso3 .mcab{position:absolute;left:0;right:0;top:0;height:54px;background:rgba(255,243,227,.95);border-bottom:1px solid var(--linea);display:flex;align-items:center;gap:8px;padding:0 12px}
+#obPaso3 .mcab img{width:32px;height:32px;border-radius:10px}
+#obPaso3 .mcab .nom{font-size:15px;font-weight:900;letter-spacing:-.015em;margin-right:auto}
+#obPaso3 .mb{width:34px;height:34px;border-radius:50%;border:1px solid var(--linea);background:#fff;color:var(--azul);display:flex;align-items:center;justify-content:center;position:relative;transition:background .2s,border-color .2s,color .2s,transform .2s}
+#obPaso3 .mb svg{width:17px;height:17px;display:block}
+#obPaso3 .mb.on{background:var(--azul);border-color:var(--azul);color:var(--tinta)}
+#obPaso3 .mb.pulsa{transform:scale(.9)}
+#obPaso3 .mb .mpunto{position:absolute;top:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:var(--groc);border:2px solid #fff}
+#obPaso3 .mb.halo::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:2.5px solid var(--groc);animation:obcHalo 1.3s ease-out infinite}
+@keyframes obcHalo{0%{transform:scale(.7);opacity:1}100%{transform:scale(1.35);opacity:0}}
+#obPaso3 .cuerpo{position:absolute;left:0;right:0;top:54px;bottom:0;padding:12px;overflow:hidden}
+#obPaso3 .dedo{position:absolute;width:34px;height:34px;border-radius:50%;background:rgba(18,49,79,.14);border:2px solid rgba(18,49,79,.35);transform:translate(-50%,-50%);pointer-events:none;opacity:0;transition:opacity .2s,left .35s ease,top .35s ease;z-index:5}
+#obPaso3 .dedo.on{opacity:1}
+#obPaso3 .rot{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta2);margin:0 0 6px}
+/* escena 1: el calendario */
+#obPaso3 .mes{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+#obPaso3 .mes b{font-size:9px;font-weight:800;color:var(--tinta2);text-align:center;letter-spacing:.06em}
+#obPaso3 .mes s{display:flex;text-decoration:none;aspect-ratio:1;border-radius:6px;background:var(--papel2);border:1px solid var(--linea);font-size:9.5px;font-weight:700;color:var(--tinta2);align-items:center;justify-content:center;transition:background .25s,color .25s,border-color .25s}
+#obPaso3 .mes s.fs{background:var(--cel2)}
+#obPaso3 .mes s.a{background:var(--c1);border-color:var(--c1);color:var(--tinta)}
+#obPaso3 .mes s.b{background:var(--c2);border-color:var(--c2);color:var(--tinta)}
+#obPaso3 .mes s.f{background:var(--groc);border-color:var(--groc);color:#fff}
+#obPaso3 .mes s.h{background:#FDEFEC;border-color:var(--buit);color:var(--buit)}
+#obPaso3 .leyenda{display:flex;gap:12px;font-size:11px;font-weight:800;color:var(--tinta2);margin-top:10px;flex-wrap:wrap}
+#obPaso3 .leyenda i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+#obPaso3 .aviso{position:absolute;left:12px;right:12px;bottom:12px;background:#FDEFEC;border:1px solid var(--buit);color:var(--buit);border-radius:12px;padding:8px 12px;font-size:12px;font-weight:800;opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s}
+#obPaso3 .aviso.on{opacity:1;transform:none}
+#obPaso3 .aviso.ok{background:#E6F4F3;border-color:var(--c2);color:#2E827D}
+#obPaso3 .vacio-cal{display:flex;align-items:center;justify-content:center;height:100%;color:var(--tinta2);font-size:12.5px;font-weight:700;text-align:center;padding:0 20px}
+/* escena 2: la lista y preparar el envío */
+#obPaso3 .cab2{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+#obPaso3 .cab2 h6{margin:0;font-size:14px;font-weight:800;flex:1}
+#obPaso3 .cab2 small{font-size:10px;font-weight:800;color:var(--tinta2)}
+#obPaso3 .mbtn{display:inline-flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;padding:7px 13px;border-radius:99px;background:var(--azul);color:var(--tinta);transition:transform .2s;margin-bottom:8px}
+#obPaso3 .mbtn.pulsa{transform:scale(.93)}
+#obPaso3 .mbtn.gris{background:#fff;border:1.2px solid var(--linea);color:var(--tinta2);margin-left:6px}
+#obPaso3 .mart{display:flex;align-items:center;gap:8px;background:var(--papel2);border:1px solid var(--linea);border-radius:10px;padding:6px 8px;margin-bottom:5px;font-size:11.5px;font-weight:800}
+#obPaso3 .mart small{display:block;font-size:9.5px;font-weight:700;color:var(--tinta2)}
+#obPaso3 .mart .t{flex:1;min-width:0;line-height:1.25}
+#obPaso3 .mart .ok{width:20px;height:20px;border-radius:6px;border:1.3px solid var(--linea);background:#fff;flex:0 0 auto}
+#obPaso3 .mart .x{width:20px;height:20px;border-radius:50%;border:1px solid var(--linea);background:#fff;color:var(--tinta2);font-size:10px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+#obPaso3 .mhoja{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -10px 40px -18px rgba(90,60,35,.55);padding:12px 12px 10px;transform:translateY(105%);transition:transform .32s cubic-bezier(.22,.8,.3,1);z-index:3}
+#obPaso3 .mhoja.on{transform:none}
+#obPaso3 .mhoja h6{margin:0;font-size:13px;font-weight:800}
+#obPaso3 .mhoja .sub{font-size:10px;font-weight:700;color:var(--tinta2);margin:0 0 8px}
+#obPaso3 .mhoja .sel{display:flex;gap:6px;margin-bottom:8px}
+#obPaso3 .mhoja .sel span{font-size:10.5px;font-weight:800;padding:4px 10px;border-radius:99px;border:1.2px solid var(--linea);color:var(--tinta2);background:#fff}
+#obPaso3 .mchk{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;margin-bottom:6px}
+#obPaso3 .mchk i{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--linea);background:#fff;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;font-weight:900;color:transparent;transition:background .2s,border-color .2s,color .2s;flex:0 0 auto}
+#obPaso3 .mchk i.on{background:var(--azul);border-color:var(--azul);color:var(--tinta)}
+#obPaso3 .mchk small{color:var(--tinta2);font-weight:600}
+#obPaso3 .mhoja .env{display:block;text-align:center;margin-top:6px;font-size:12px;font-weight:800;padding:9px;border-radius:99px;background:var(--azul);color:var(--tinta);transition:opacity .2s,transform .2s}
+#obPaso3 .mhoja .env.off{opacity:.45}
+#obPaso3 .mhoja .env.pulsa{transform:scale(.95)}
+#obPaso3 .wa{position:absolute;left:12px;right:12px;bottom:12px;background:#DCF8C6;border-radius:14px 14px 4px 14px;padding:9px 12px;font-size:11.5px;line-height:1.4;color:#1b2b1e;box-shadow:0 8px 20px -12px rgba(0,0,0,.4);opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s;z-index:4}
+#obPaso3 .wa.on{opacity:1;transform:none}
+#obPaso3 .wa b{display:block;font-size:10px;color:#075E54;margin-bottom:2px}
+#obPaso3 .wa .hora{float:right;font-size:9px;color:#5a7a63;margin-top:4px}
+/* escena 3: la pareja */
+#obPaso3 .dos{position:absolute;inset:18px;display:flex;gap:14px;align-items:stretch;justify-content:center}
+#obPaso3 .movil{flex:1 1 0;max-width:140px;border:2px solid var(--tinta);border-radius:18px;padding:10px 8px;background:#fff;display:flex;flex-direction:column;gap:6px;position:relative}
+#obPaso3 .movil::before{content:"";width:34px;height:4px;border-radius:3px;background:var(--tinta);margin:0 auto 2px;opacity:.5}
+#obPaso3 .movil .nom{font-size:10px;font-weight:800;color:var(--tinta2);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#obPaso3 .movil .fila{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+#obPaso3 .movil .fila s{text-decoration:none;aspect-ratio:1;border-radius:3px;background:var(--papel2);border:1px solid var(--linea);transition:background .25s,border-color .25s}
+#obPaso3 .movil .fila s.a{background:var(--c1);border-color:var(--c1)}
+#obPaso3 .movil .fila s.b{background:var(--c2);border-color:var(--c2)}
+#obPaso3 .sinc{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;background:var(--azul);color:var(--tinta);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px -8px var(--azul);opacity:0;transition:opacity .25s}
+#obPaso3 .sinc.on{opacity:1;animation:obcGira 1s linear infinite}
+#obPaso3 .sinc svg{width:18px;height:18px}
+@keyframes obcGira{to{transform:translate(-50%,-50%) rotate(360deg)}}
+/* escena 4: lactancia y dudas */
+#obPaso3 .obc-pills{position:absolute;left:16px;right:16px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:14px;align-items:center}
+#obPaso3 .obc-pill{display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:99px;border:1.5px solid var(--linea);background:#fff;font-size:13.5px;font-weight:800;transition:transform .2s,border-color .2s}
+#obPaso3 .obc-pill .pip{width:10px;height:10px;border-radius:3px;background:var(--c2)}
+#obPaso3 .obc-pill.pulsa{transform:scale(.94);border-color:var(--azul)}
+#obPaso3 .obc-pill .n{color:var(--tinta2);font-weight:700;transition:color .2s}
+#obPaso3 .obc-pill .n.cambia{color:var(--buit)}
+#obPaso3 .q{width:44px;height:44px;border-radius:50%;border:1px solid var(--linea);background:#fff;color:var(--azul);font-size:22px;font-weight:900;display:flex;align-items:center;justify-content:center}
+#obPaso3 .bocadillo{background:var(--papel2);border:1px solid var(--linea);border-radius:12px;padding:8px 12px;font-size:11.5px;font-weight:700;color:var(--tinta2);max-width:230px;text-align:center;opacity:0;transition:opacity .3s}
+#obPaso3 .bocadillo.on{opacity:1}
+/* el punto de «sin estrenar» sobre el botón de la lista */
 .cab-b{position:relative}
 .cab-b .punto{position:absolute;top:0;right:0;width:10px;height:10px;border-radius:50%;
   background:var(--groc);border:2px solid var(--ceramica)}
-/* ===== /tutorial ===== */
+/* ===== /presentación ===== */
 
 /* ===== selectores propios: fecha y comunidad ===== */
 .hoja.pick{z-index:80}
@@ -657,6 +742,10 @@ html,body{overscroll-behavior-y:contain}
       móvil se sustituye por el de quien te invita. Si lo quieres conservar, expórtalo antes (arriba).</p>
     </div>
     <div class="aj-sep"></div>
+    <div class="aj-fila" style="margin-bottom:10px">
+      <button type="button" class="mini" id="btPresentacion">Ver la presentación</button>
+      <span class="aj-nota" style="margin:0;align-self:center">Las cuatro pantallas de bienvenida.</span>
+    </div>
     <div class="aj-fila">
       <span class="aj-nota" id="ajCuenta" style="margin:0;flex:1 1 auto;min-width:0;word-break:break-all"></span>
       <button type="button" class="mini" id="btSalir">Cerrar sesión</button>
@@ -802,7 +891,7 @@ html,body{overscroll-behavior-y:contain}
 
 <aside class="hoja" id="hojaEnviar" hidden role="dialog" aria-modal="true" aria-labelledby="tEnviar">
   <div class="hoja-cab"><span class="ht"><h2 id="tEnviar">Enviar la lista</h2>
-    <small>elige qué artículos van y en qué formato</small></span>
+    <small>marca lo que quieras enviar y elige el formato</small></span>
     <button type="button" class="hoja-x" data-cerrar aria-label="Cerrar">✕</button></div>
   <div class="hoja-cuerpo">
     <div class="aj-fila" style="margin-bottom:8px">
@@ -810,6 +899,7 @@ html,body{overscroll-behavior-y:contain}
       <button type="button" class="cta" id="btEnvPagina2" style="flex:1 1 46%;padding:10px 12px;font-size:14px;background:var(--azulF)">Enviar como página</button>
     </div>
     <p class="aj-nota" style="margin:0 0 8px">El texto lleva los enlaces: en WhatsApp solo queda elegir a quién. La página es un archivo que se abre en cualquier navegador, para enseñar la lista sin dar acceso a la app.</p>
+    <p class="env-vacio" id="envVacio">Nada marcado todavía. Toca los artículos que quieras enviar, o «Todos» si va la lista entera.</p>
     <div class="aj-fila" style="margin-bottom:2px">
       <button type="button" class="mini" id="btSelTodo">Todos</button>
       <button type="button" class="mini" id="btSelNada">Ninguno</button>
@@ -927,47 +1017,69 @@ html,body{overscroll-behavior-y:contain}
     </div>
   </form>
 
-  <!-- ===== tutorial: paso final del onboarding. Para volver atrás: quitar este bloque,
-       el bloque CSS "tutorial", el span #puntoLista y las líneas marcadas "tutorial" en el JS ===== -->
-  <section class="paso" id="obPaso3" hidden aria-labelledby="obT3">
-    <p class="paso-n">Antes de empezar</p>
-    <h2 id="obT3">Cuatro cosas antes de empezar</h2>
-    <div class="ob-feats">
-      <div class="ob-feat">
-        <span class="ic"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.6 4.4l1.2 1.2 2-2M2.6 9l1.2 1.2 2-2M2.6 13.6l1.2 1.2 2-2M9.2 4.7h6.2M9.2 9.3h6.2M9.2 13.9h6.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <div><h4>La lista del bebé</h4><p>Las compras ordenadas por semana de gestación, con enlaces y precios orientativos. Envíasela a quien pregunte qué os regala.</p>
-          <button type="button" class="mini ob-ir" id="obVerLista"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.6 4.4l1.2 1.2 2-2M2.6 9l1.2 1.2 2-2M2.6 13.6l1.2 1.2 2-2M9.2 4.7h6.2M9.2 9.3h6.2M9.2 13.9h6.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>Ver la lista</button></div>
+  <!-- ===== presentación: el paso final del onboarding, cuatro diapositivas con escenas animadas.
+       Se muestra al terminar los datos la primera vez y desde Ajustes → «Ver la presentación». ===== -->
+  <section class="paso" id="obPaso3" hidden aria-label="Cómo funciona Allonest">
+    <div class="obc">
+      <div class="obc-top">
+        <span class="obc-n" id="obcN">1 de 4</span>
+        <button type="button" class="enlace" id="obcSaltar">Saltar</button>
       </div>
-      <div class="ob-feat">
-        <span class="ic"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="2.7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M14.6 11a1.3 1.3 0 0 0 .26 1.43l.05.05a1.5 1.5 0 1 1-2.13 2.13l-.05-.05a1.3 1.3 0 0 0-1.43-.26 1.3 1.3 0 0 0-.8 1.2v.14a1.5 1.5 0 1 1-3 0v-.07a1.3 1.3 0 0 0-.86-1.2 1.3 1.3 0 0 0-1.43.26l-.05.05a1.5 1.5 0 1 1-2.13-2.13l.05-.05a1.3 1.3 0 0 0 .26-1.43 1.3 1.3 0 0 0-1.2-.8H2A1.5 1.5 0 1 1 2 7h.07a1.3 1.3 0 0 0 1.2-.86 1.3 1.3 0 0 0-.26-1.43l-.05-.05a1.5 1.5 0 1 1 2.13-2.13l.05.05a1.3 1.3 0 0 0 1.43.26H6.6a1.3 1.3 0 0 0 .8-1.2V1.5a1.5 1.5 0 1 1 3 0v.07a1.3 1.3 0 0 0 .8 1.2 1.3 1.3 0 0 0 1.43-.26l.05-.05a1.5 1.5 0 1 1 2.13 2.13l-.05.05a1.3 1.3 0 0 0-.26 1.43V6.2a1.3 1.3 0 0 0 1.2.8h.14a1.5 1.5 0 1 1 0 3h-.07a1.3 1.3 0 0 0-1.2.8Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <div><h4>Compartir con tu pareja</h4><p>En Ajustes. Una invitación de un solo uso y los dos veis y tocáis el mismo calendario y la misma lista.</p>
-          <button type="button" class="mini ob-ir" id="obVerAjustes">Abrir Ajustes</button></div>
+      <div class="obc-pista" id="obcPista">
+        <section class="obc-dia" aria-label="1 de 4: el calendario">
+          <div class="esc" id="obcEsc1">
+            <div class="mcab"><img src="icons/icono.svg" alt=""><span class="nom">Allonest</span>
+              <span class="mb" id="ob1cal"><svg viewBox="0 0 18 18" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+              <span class="mb" id="ob1lst"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.6 4.4l1.2 1.2 2-2M2.6 9l1.2 1.2 2-2M2.6 13.6l1.2 1.2 2-2M9.2 4.7h6.2M9.2 9.3h6.2M9.2 13.9h6.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="mpunto" id="ob1punto"></span></span>
+            </div>
+            <div class="cuerpo" id="obcC1"></div><div class="dedo" id="obcDedo1"></div><div class="aviso" id="obcAviso1"></div>
+          </div>
+          <h2>El calendario: pintáis los días y la app avisa de los huecos</h2>
+          <p>Arriba a la derecha hay dos botones. <b>El del calendario</b> es donde se colocan las semanas de cada uno, con los festivos ya puestos: se ve al momento quién está en casa y cuándo no está nadie.</p>
+        </section>
+        <section class="obc-dia" aria-label="2 de 4: la lista del bebé">
+          <div class="esc" id="obcEsc2">
+            <div class="mcab"><img src="icons/icono.svg" alt=""><span class="nom">Allonest</span>
+              <span class="mb" id="ob2cal"><svg viewBox="0 0 18 18" aria-hidden="true"><rect x="2.5" y="3.5" width="13" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 7.5h13M6 2v3M12 2v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
+              <span class="mb" id="ob2lst"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2.6 4.4l1.2 1.2 2-2M2.6 9l1.2 1.2 2-2M2.6 13.6l1.2 1.2 2-2M9.2 4.7h6.2M9.2 9.3h6.2M9.2 13.9h6.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="mpunto" id="ob2punto"></span></span>
+            </div>
+            <div class="cuerpo" id="obcC2"></div><div class="mhoja" id="obcHoja"></div><div class="dedo" id="obcDedo2"></div><div class="wa" id="obcWa"></div>
+          </div>
+          <h2>La lista del bebé: qué hace falta y cuándo</h2>
+          <p><b>El otro botón de arriba</b> abre la lista: las compras semana a semana, con precios orientativos. Quitáis lo que no queráis, marcáis lo comprado y, al <b>preparar la lista</b>, elegís solo lo que enviáis a quien pregunte qué regalar.</p>
+        </section>
+        <section class="obc-dia" aria-label="3 de 4: con tu pareja">
+          <div class="esc blanca" id="obcEsc3">
+            <div class="dos">
+              <div class="movil"><div class="nom" id="obcNom1"></div><div class="fila" id="obcM1"></div><div class="fila" id="obcM1b"></div></div>
+              <div class="movil"><div class="nom" id="obcNom2"></div><div class="fila" id="obcM2"></div><div class="fila" id="obcM2b"></div></div>
+            </div>
+            <div class="sinc" id="obcSinc"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9a6 6 0 0 1 10.2-4.3M15 9a6 6 0 0 1-10.2 4.3M13 2v3h-3M5 16v-3h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="dedo" id="obcDedo3"></div>
+          </div>
+          <h2>Los dos en el mismo calendario</h2>
+          <p>Desde Ajustes invitas a tu pareja con un código de un solo uso. Lo que uno pinta aparece en el móvil del otro; la lista también.</p>
+        </section>
+        <section class="obc-dia" aria-label="4 de 4: lactancia y dudas">
+          <div class="esc blanca" id="obcEsc4">
+            <div class="obc-pills">
+              <div class="obc-pill" id="obcLact"><span class="pip"></span>Lactancia <span class="n" id="obcLactN">· 15 d</span></div>
+              <div class="bocadillo" id="obcBoc1">Vienen 15 días por persona. Si tu convenio da otra cifra, tócala y cámbiala.</div>
+              <div class="q" id="obcQ">?</div>
+              <div class="bocadillo" id="obcBoc2">La interrogación explica cada bolsa de días, sin jerga.</div>
+            </div>
+            <div class="dedo" id="obcDedo4"></div>
+          </div>
+          <h2>Dos cosas más, y a pintar</h2>
+          <p>La lactancia acumulada viene con 15 días, pero muchos convenios dan otra cifra: se cambia tocando la pastilla. Y cualquier duda, en el botón de la interrogación.</p>
+        </section>
       </div>
-      <div class="ob-feat">
-        <span class="ic"><svg viewBox="0 0 18 18" aria-hidden="true"><path d="M9 2.2c2.6 3.2 4.6 5.6 4.6 8.3a4.6 4.6 0 0 1-9.2 0c0-2.7 2-5.1 4.6-8.3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
-        <div><h4>La lactancia</h4><p>Vienen 15 días por persona, la cifra habitual. Muchos convenios dan otra (los docentes casi siempre): en el calendario, toca la pastilla <b>Lactancia</b> y cambia el total.</p></div>
-      </div>
-      <div class="ob-feat">
-        <span class="ic"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6.9 6.9a2.2 2.2 0 1 1 3 2.05c-.6.25-.9.75-.9 1.35v.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="9" cy="13.2" r="1" fill="currentColor"/></svg></span>
-        <div><h4>Cualquier duda</h4><p>El botón de la interrogación explica cada bolsa de días y sus reglas, sin jerga.</p></div>
+      <div class="obc-pie">
+        <div class="obc-puntos" id="obcPuntos"><i class="on"></i><i></i><i></i><i></i></div>
+        <button type="button" class="cta" id="obcSig">Siguiente</button>
       </div>
     </div>
-    <div class="acciones"><button type="button" class="cta" id="obListo">A pintar el calendario</button></div>
   </section>
-</div>
-
-<!-- tutorial: la vista previa de la lista, por encima del onboarding y con vuelta.
-     No es la lista real: solo enseña el catálogo, sin tocar el estado de nadie. -->
-<div class="ob-fake" id="obFake" hidden role="dialog" aria-modal="true" aria-label="Vista previa de la lista del bebé">
-  <div class="ob-fake-cab">
-    <button type="button" class="cab-b" id="obFakeVolver" aria-label="Volver al onboarding">
-      <svg viewBox="0 0 18 18" aria-hidden="true"><path d="M11.5 3.2 5.7 9l5.8 5.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <h2>La lista del bebé</h2>
-    <span class="ob-fake-tag">vista previa</span>
-  </div>
-  <div class="ob-fake-cuerpo" id="obFakeCuerpo"></div>
-<!-- ===== /tutorial ===== -->
 </div>
 
 <div class="onb" id="auth" hidden role="dialog" aria-modal="true" aria-label="Tu cuenta">
@@ -3318,6 +3430,7 @@ const reduceMov=()=>window.matchMedia&&matchMedia('(prefers-reduced-motion: redu
 function muestraPasoOnb(id){
   const sig=$(id), ant=ONB.paso?$(ONB.paso):null;
   ONB.paso=id;
+  if(id==='obPaso3') obcArranca(); else obcPara();
   const entra=()=>{
     if(ant&&ant!==sig){ ant.hidden=true; ant.classList.remove('visible'); }
     sig.hidden=false;
@@ -3351,6 +3464,7 @@ function abreOnb(modo){
   muestraPasoOnb(modo==='inicial'?'obBienvenida':'obPaso1');
 }
 function cierraOnb(){
+  obcPara();
   if(ONB.paso){ $(ONB.paso).hidden=true; $(ONB.paso).classList.remove('visible'); }
   ONB={modo:null,paso:null};
   $('onb').hidden=true;
@@ -3437,6 +3551,138 @@ function despedidaOnb(){
   if(S.perfil.apodo&&dpar>0)
     hint('Listo. Quedan '+(dpar>=14?Math.round(dpar/7)+' semanas':dpar+' días')+' para conocer a '+S.perfil.apodo+'.');
 }
+
+/* ===== presentación: las cuatro diapositivas del paso final, con escenas animadas en bucle.
+   Cada escena es una secuencia de temporizadores (OBC.anim) que se limpia al cambiar de
+   diapositiva o al cerrar. Los nombres y el apodo salen del perfil, para que la escena
+   hable de esta familia y no de una inventada. ===== */
+const OBC={dia:0,anim:[],prog:null,scrollT:null,activa:false};
+const obcEn=(ms,fn)=>OBC.anim.push(setTimeout(fn,ms));
+function obcLimpia(){ OBC.anim.forEach(clearTimeout); OBC.anim=[]; }
+function obcNombres(){
+  const a=(S.perfil.progenitores[0]||S.a.nom||'').trim(), b=(S.perfil.progenitores[1]||S.b.nom||'').trim();
+  return { a:(a&&a!=='Progenitor A')?a:'Marta', b:(bi()&&b&&b!=='Progenitor B')?b:(bi()?'Iván':''), apodo:(S.perfil.apodo||'').trim()||'el bebé' };
+}
+function obcPinta(){
+  $('obcN').textContent=(OBC.dia+1)+' de 4';
+  $('obcPuntos').querySelectorAll('i').forEach((i,k)=>i.classList.toggle('on',k===OBC.dia));
+  $('obcSig').textContent=OBC.dia===3?'A pintar el calendario':'Siguiente';
+  obcLimpia();
+  [obcEscena1,obcEscena2,obcEscena3,obcEscena4][OBC.dia]();
+}
+function obcVe(n){
+  OBC.dia=Math.max(0,Math.min(3,n));
+  clearTimeout(OBC.prog); OBC.prog=setTimeout(()=>{OBC.prog=null;},800);
+  const p=$('obcPista'); p.scrollTo({left:p.clientWidth*OBC.dia,behavior:reduceMov()?'auto':'smooth'});
+  obcPinta();
+}
+function obcArranca(){
+  if(OBC.activa){ obcPinta(); return; }
+  OBC.activa=true; OBC.dia=0;
+  const p=$('obcPista'); p.scrollTo({left:0});
+  if(!p.dataset.enganchada){
+    p.dataset.enganchada='1';
+    p.addEventListener('scroll',()=>{ clearTimeout(OBC.scrollT); OBC.scrollT=setTimeout(()=>{ if(OBC.prog||!OBC.activa) return; const n=Math.round(p.scrollLeft/p.clientWidth); if(n!==OBC.dia){ OBC.dia=n; obcPinta(); } },140); },{passive:true});
+    window.addEventListener('resize',()=>{ if(OBC.activa) p.scrollTo({left:p.clientWidth*OBC.dia}); });
+  }
+  // la sección aún está oculta cuando llega aquí: las medidas del dedo se toman en el siguiente cuadro
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(OBC.activa) obcPinta(); }));
+}
+function obcPara(){ if(!OBC.activa) return; OBC.activa=false; obcLimpia(); }
+function obcTermina(){
+  const modo=ONB.modo;
+  cierraOnb();
+  if(modo==='inicial') despedidaOnb();
+}
+function obcDedo(dedo,el,esc){
+  const r=el.getBoundingClientRect(), e=esc.getBoundingClientRect();
+  dedo.style.left=(r.left-e.left+r.width/2)+'px'; dedo.style.top=(r.top-e.top+r.height/2)+'px';
+  dedo.classList.add('on');
+}
+const obcPulsa=(el,ms)=>{ el.classList.add('pulsa'); setTimeout(()=>el.classList.remove('pulsa'),ms||220); };
+/* 1: el botón del calendario, y pintar; queda un hueco y se cubre */
+function obcEscena1(){
+  const N=obcNombres(), c=$('obcC1'), dedo=$('obcDedo1'), aviso=$('obcAviso1'), bc=$('ob1cal'), bl=$('ob1lst');
+  aviso.className='aviso'; aviso.textContent='Del 13 al 15 '+N.apodo+' se queda sin nadie'; dedo.classList.remove('on');
+  bc.className='mb halo'; bl.className='mb'; $('ob1punto').hidden=false;
+  c.innerHTML='<div class="vacio-cal">Toca el botón del calendario, arriba a la derecha</div>';
+  const segundo=N.b||N.a, cl2=N.b?'b':'a';
+  let t=1400;
+  obcEn(t, ()=>{ obcDedo(dedo,bc,$('obcEsc1')); obcPulsa(bc); }); t+=350;
+  obcEn(t, ()=>{ bc.className='mb on'; dedo.classList.remove('on');
+    c.innerHTML='<p class="rot">Octubre</p><div class="mes" id="obcMes"></div><div class="leyenda"><span><i style="background:var(--c1)"></i>'+esc(N.a)+'</span>'+(N.b?'<span><i style="background:var(--c2)"></i>'+esc(N.b)+'</span>':'')+'<span><i style="background:var(--groc)"></i>festivo</span></div>';
+    const m=$('obcMes'); m.innerHTML='LMXJVSD'.split('').map(d=>'<b>'+d+'</b>').join('')+Array.from({length:28},(_,i)=>'<s data-d="'+(i+1)+'">'+(i+1)+'</s>').join('');
+    [6,7,13,14,20,21,27,28].forEach(d=>m.querySelector('[data-d="'+d+'"]').classList.add('fs'));
+    m.querySelector('[data-d="15"]').classList.add('f');
+  }); t+=700;
+  const celda=d=>$('obcMes').querySelector('[data-d="'+d+'"]');
+  for(let d=1; d<=12; d++){ const dd=d; obcEn(t, ()=>{ obcDedo(dedo,celda(dd),$('obcEsc1')); celda(dd).classList.add('a'); }); t+=100; }
+  obcEn(t+150, ()=>dedo.classList.remove('on')); t+=450;
+  for(let d=28; d>=16; d--){ const dd=d; obcEn(t, ()=>{ obcDedo(dedo,celda(dd),$('obcEsc1')); celda(dd).classList.add(cl2); }); t+=100; }
+  obcEn(t+150, ()=>dedo.classList.remove('on')); t+=450;
+  obcEn(t, ()=>{ [13,14,15].forEach(d=>{ celda(d).classList.remove('f'); celda(d).classList.add('h'); }); aviso.classList.add('on'); }); t+=2200;
+  obcEn(t, ()=>{ [13,14].forEach(d=>celda(d).classList.add(cl2)); [13,14,15].forEach(d=>celda(d).classList.remove('h')); celda(15).classList.add('f'); aviso.textContent='Cubierto: '+segundo+' empieza el 13'; aviso.classList.add('ok'); }); t+=2400;
+  obcEn(t, obcEscena1);
+}
+/* 2: el botón de la lista → la lista → preparar → marcar dos → enviar → WhatsApp */
+function obcEscena2(){
+  const N=obcNombres(), c=$('obcC2'), dedo=$('obcDedo2'), bc=$('ob2cal'), bl=$('ob2lst'), hoja=$('obcHoja'), wa=$('obcWa');
+  bc.className='mb on'; bl.className='mb halo'; $('ob2punto').hidden=false; dedo.classList.remove('on'); hoja.classList.remove('on'); wa.classList.remove('on');
+  c.innerHTML='<div class="vacio-cal">El otro botón de arriba abre la lista del bebé</div>';
+  const items=[{n:'Carrito de paseo (dúo o trío)',p:'350-900 €'},{n:'Silla de coche i-Size',p:'150-350 €'},{n:'Vigilabebés',p:'40-180 €'},{n:'Espejo retrovisor',p:'10-20 €'}];
+  const titulo=N.apodo==='el bebé'?'La lista del bebé':'La lista de '+esc(N.apodo);
+  wa.innerHTML='<b>'+esc(N.a)+'</b>'+titulo+', por si queréis regalar algo:<br>· Carrito de paseo · Vigilabebés<span class="hora">21:32 ✓✓</span>';
+  let t=1400;
+  obcEn(t, ()=>{ obcDedo(dedo,bl,$('obcEsc2')); obcPulsa(bl); }); t+=350;
+  obcEn(t, ()=>{ bl.className='mb on'; bc.className='mb'; $('ob2punto').hidden=true; dedo.classList.remove('on');
+    c.innerHTML='<div class="cab2"><h6>'+titulo+'</h6><small>0 de 23 comprados</small></div>'+
+      '<span class="mbtn" id="obcPrep">Preparar la lista</span><span class="mbtn gris">Añadir algo</span>'+
+      '<p class="rot" style="margin-top:2px">Semana 24 · <span style="color:var(--azul)">toca ahora</span></p>'+
+      items.map(it=>'<div class="mart"><span class="ok"></span><div class="t">'+it.n+'<small>'+it.p+'</small></div><span class="x">✕</span></div>').join('');
+  }); t+=1500;
+  obcEn(t, ()=>{ const b=$('obcPrep'); obcDedo(dedo,b,$('obcEsc2')); obcPulsa(b); }); t+=350;
+  obcEn(t, ()=>{ dedo.classList.remove('on');
+    hoja.innerHTML='<h6>'+titulo+'</h6><p class="sub">marca lo que quieras enviar</p><div class="sel"><span>Todos</span><span>Ninguno</span></div>'+
+      items.map((it,k)=>'<div class="mchk" data-k="'+k+'"><i>✓</i>'+it.n+'&nbsp;<small>('+it.p+')</small></div>').join('')+
+      '<span class="env off" id="obcEnv">Enviar '+titulo.toLowerCase()+'</span>';
+    hoja.classList.add('on'); }); t+=1200;
+  const marca=(k,n)=>{ const f=hoja.querySelector('[data-k="'+k+'"] i'); obcDedo(dedo,f,$('obcEsc2')); f.classList.add('on'); const e=$('obcEnv'); e.classList.remove('off'); e.textContent='Enviar '+titulo.toLowerCase()+' · '+n+(n===1?' artículo':' artículos'); };
+  obcEn(t, ()=>marca(0,1)); t+=900;
+  obcEn(t, ()=>marca(2,2)); t+=900;
+  obcEn(t, ()=>{ const e=$('obcEnv'); obcDedo(dedo,e,$('obcEsc2')); obcPulsa(e); }); t+=350;
+  obcEn(t, ()=>{ dedo.classList.remove('on'); hoja.classList.remove('on'); wa.classList.add('on'); }); t+=3200;
+  obcEn(t, ()=>wa.classList.remove('on')); t+=500;
+  obcEn(t, obcEscena2);
+}
+/* 3: dos móviles; lo que pinta uno aparece en el otro */
+function obcEscena3(){
+  const N=obcNombres();
+  $('obcNom1').textContent=N.a; $('obcNom2').textContent=N.b||'tu pareja';
+  const filas=['obcM1','obcM1b','obcM2','obcM2b'].map(id=>{ const f=$(id); f.innerHTML=Array.from({length:7},()=>'<s></s>').join(''); return f; });
+  const c=(f,i)=>f.children[i];
+  const sinc=$('obcSinc'), dedo=$('obcDedo3'); sinc.classList.remove('on'); dedo.classList.remove('on');
+  let t=500;
+  for(let i=0;i<7;i++){ const k=i; obcEn(t, ()=>{ obcDedo(dedo,c(filas[0],k),$('obcEsc3')); c(filas[0],k).classList.add('a'); }); t+=130; }
+  obcEn(t+150, ()=>{ dedo.classList.remove('on'); sinc.classList.add('on'); }); t+=900;
+  obcEn(t, ()=>{ sinc.classList.remove('on'); for(let i=0;i<7;i++) c(filas[2],i).classList.add('a'); }); t+=1100;
+  for(let i=0;i<5;i++){ const k=i; obcEn(t, ()=>{ obcDedo(dedo,c(filas[3],k),$('obcEsc3')); c(filas[3],k).classList.add('b'); }); t+=130; }
+  obcEn(t+150, ()=>{ dedo.classList.remove('on'); sinc.classList.add('on'); }); t+=900;
+  obcEn(t, ()=>{ sinc.classList.remove('on'); for(let i=0;i<5;i++) c(filas[1],i).classList.add('b'); }); t+=2600;
+  obcEn(t, obcEscena3);
+}
+/* 4: la pastilla de lactancia cambia de 15 a 20; la interrogación */
+function obcEscena4(){
+  const p=$('obcLact'), n=$('obcLactN'), b1=$('obcBoc1'), b2=$('obcBoc2'), dedo=$('obcDedo4');
+  n.textContent='· 15 d'; n.classList.remove('cambia'); b1.classList.remove('on'); b2.classList.remove('on'); dedo.classList.remove('on');
+  let t=600;
+  obcEn(t, ()=>{ obcDedo(dedo,p,$('obcEsc4')); obcPulsa(p,350); }); t+=350;
+  obcEn(t, ()=>{ dedo.classList.remove('on'); b1.classList.add('on'); }); t+=900;
+  obcEn(t, ()=>{ n.textContent='· 20 d'; n.classList.add('cambia'); }); t+=1800;
+  obcEn(t, ()=>{ b1.classList.remove('on'); obcDedo(dedo,$('obcQ'),$('obcEsc4')); }); t+=400;
+  obcEn(t, ()=>{ dedo.classList.remove('on'); b2.classList.add('on'); }); t+=2600;
+  obcEn(t, obcEscena4);
+}
+/* ===== /presentación ===== */
 
 /* ===== selectores propios (fecha y comunidad): los del sistema no casan con el diseño.
    Los inputs/selects nativos siguen en el DOM como portadores del valor: aquí solo se
@@ -3803,7 +4049,7 @@ function gruposSel(sel){
 function abreEnviar(){
   const pend=pendientesLista();
   if(!pend.length){ hint('No queda nada pendiente que enviar.'); return; }
-  SELENV=new Set(pend.map(it=>it.id));
+  SELENV=new Set();   // se parte de nada marcado: se eligen solo los artículos que van (antes iban todos)
   pintaEnviar();
   abreHoja('hojaEnviar');
 }
@@ -3830,6 +4076,7 @@ function actualizaEnviar(){
   $('btEnvPagina2').textContent=ap?'Enviar la página de '+ap:'Enviar como página';
   $('btEnvPagina').textContent=(ap?'Enviar la página de '+ap:'Enviar como página')+' (solo lectura)';
   $('btEnvTexto').disabled=!n; $('btEnvTexto2').disabled=!n; $('btEnvPagina').disabled=!n; $('btEnvPagina2').disabled=!n;
+  $('envVacio').hidden=n>0;
 }
 function textoLista(sel){
   const grupos=gruposSel(sel);
@@ -4453,29 +4700,10 @@ async function init(){
   $('obPaso1').addEventListener('submit',ev=>{ev.preventDefault(); guardaPaso1();});
   $('obPaso2').addEventListener('submit',ev=>{ev.preventDefault(); guardaPaso2(true);});
   $('obAhoraNo').addEventListener('click',()=>guardaPaso2(false));
-  $('obListo').addEventListener('click',()=>{ TOUR=false; cierraOnb(); despedidaOnb(); });   // tutorial
-  // tutorial: «Ver la lista» abre la vista previa POR ENCIMA del onboarding, que ni se cierra;
-  // la flecha vuelve exactamente a donde estabas. Ajustes sí es la hoja real, con vuelta (TOUR).
-  $('obVerLista').addEventListener('click',()=>{
-    const c=$('obFakeCuerpo');
-    if(!c.childElementCount){
-      let html='', sem=null;
-      CATV.forEach(it=>{
-        if(it.sem!==sem){ sem=it.sem; html+='<div class="lst-sem">Semana '+sem+'</div>'; }
-        const ej=(it.ejemplos||[]).map(e=>e.t).join(' · ');
-        html+='<div class="art"><span class="art-chk" aria-hidden="true">✓</span>'+
-          '<div class="art-tx"><b>'+esc(it.nombre)+'</b><small>'+esc((it.precio||'')+(ej?' · '+ej:''))+'</small></div></div>';
-      });
-      c.innerHTML=html;
-    }
-    c.scrollTop=0;
-    $('obFake').hidden=false;
-    $('obFakeVolver').focus();
-  });
-  const cierraFake=()=>{ $('obFake').hidden=true; $('obVerLista').focus(); };
-  $('obFakeVolver').addEventListener('click',cierraFake);
-  $('obFake').addEventListener('keydown',ev=>{ if(ev.key==='Escape'){ev.stopPropagation(); cierraFake();} });
-  $('obVerAjustes').addEventListener('click',()=>{ TOUR=true; cierraOnb(); $('abreAjustes').click(); });
+  // presentación: Siguiente / Saltar / «A pintar el calendario»; desde Ajustes se vuelve a ver
+  $('obcSig').addEventListener('click',()=>{ if(OBC.dia<3) obcVe(OBC.dia+1); else obcTermina(); });
+  $('obcSaltar').addEventListener('click',obcTermina);
+  $('btPresentacion').addEventListener('click',()=>{ cierraHoja(); ONB.modo='repaso'; $('onb').hidden=false; muestraPasoOnb('obPaso3'); });
 
   // selectores propios: la fecha abre el calendario de la app y la comunidad su lista
   $('fnacBtn').addEventListener('click',()=>fpAbre($('fnac'),'Fecha prevista de parto'));
